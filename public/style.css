@@ -146,3 +146,20 @@ table {
 	border: 1px solid white;
 	display: inline-block;
 }
+
+.drawdeck {
+	height: 160px;
+	width: 120px;
+	position: absolute;
+	right: 7.5%;
+	background-color: #313131;
+	border: 1px solid white;
+}
+
+#edeck {
+	top: 5vh;
+}
+
+#mdeck {
+	top: 79vh;
+}
