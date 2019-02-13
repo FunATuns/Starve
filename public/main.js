@@ -55,6 +55,8 @@ socket.on("MatchUpdate", function (myPlayer, enemyHandSize, mySideOfBattlefield,
   renderMyBattlefield(mySideOfBattlefield);
 });
 
+
+
 /*
 Packet Info (in order):
 nothing (bool)
