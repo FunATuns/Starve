@@ -1,4 +1,4 @@
-var socket = io.connect("http://192.168.1.130:7777");
+var socket = io.connect("http://141.126.155.58:7777");
 
 socket.emit('Joined',null);
 
@@ -13,10 +13,6 @@ var loginPage = document.getElementById("Login"),
     myPlayer = {},
     players = [],
     buildings = [];
-  
-setInterval(function () {
-  animate = !animate;
-},1000);
 
 function start () {
  var name = document.getElementById("name").value;
@@ -30,8 +26,10 @@ function switchPages(page) {
   pickPage.style.display = "none";
   waitPage.style.display = "none";
 
-  docuemnt.getElementById(page).style.display = "block";
+  document.getElementById(page).style.display = "block";
 }
+
+switchPages("Match");
 
 socket.on("You'reIn", function(player){
   switchPages("Wait");
@@ -43,8 +41,3 @@ socket.on("You'reIn", function(player){
 document.onkeypress = function (evt) {
   console.log(evt.charCode);
 }
-
-
-
-
-switchPages("Login";)
