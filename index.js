@@ -139,6 +139,8 @@ console.log('User Connected');
   });
 });
 
+
+
 function newMatch (player1, player2) {
   return {
     fighters: [getFighter(player1),getFighter(player2)],
@@ -219,7 +221,7 @@ function newMatch (player1, player2) {
     },
 
     updatePlayers: function () {
-      io.sockets.connected[this.fighters[0].id].emit("MatchUpdate",this.fighters[0],this.fighters[1].hand.length,this.battlefield[0],this.battlefield[1],this.whoseTurn,this.turnCounter);
+      io.sockets.connected[this.fighters[0].id].emit("MatchUpdate",this.fighters[0],this.fighters[1].hand.length,this.battlefield[0],this.battlefield[1],this.whoseTurn == 0,this.turnCounter);
     },
 
     kill: function (battlefieldIndex, beastIndex) {

@@ -2,19 +2,64 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <title>...</title>
-    <link href="https://fonts.googleapis.com/css?family=Righteous" rel="stylesheet">
+    <title>Starve</title>
+    <link href="https://fonts.googleapis.com/css?family=Special+Elite" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="style.css">
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css">
   </head>
   <body>
     <div id="Login" class="Page">
-      <input type="text" id ="name">Name </input>
+      <p>Name</p>
+      <input type="text" id ="name">
       <button id="go" onclick="start()"> Start </button>
     </div>
     
     <div id="Match" class="Page">
-
+      <div id="enemylives" class="livesarea">52</div>
+      <div id="mylives" class="livesarea">3</div>
+      <section id="enemyhand" class="hand">
+        <ul id="effour" class="cardrow">
+          <li id="e1"></li>
+          <li id="e2"></li>
+          <li id="e3"></li>
+          <li id="e4"></li>
+        </ul>
+        <ul id="elfour" class="cardrow">
+          <li id="e5"></li>
+          <li id="e6"></li>
+          <li id="e7"></li>
+          <li id="e8"></li>
+        </ul>
+      </section>
+      <section id="myhand" class="hand">
+        <ul id="mffour" class="cardrow">
+          <li id="m1"></li>
+          <li id="m2"></li>
+          <li id="m3"></li>
+          <li id="m4"></li>
+        </ul>
+        <ul id="mlfour" class="cardrow">
+          <li id="m5"></li>
+          <li id="m6"></li>
+          <li id="m7"></li>
+          <li id="m8"></li>
+        </ul>
+      </section>
+      <table id="game">
+        <tr>
+          <td id="g1"> </td>
+          <td id="g2"> </td>
+          <td id="g3"> </td>
+          <td id="g4"> </td>
+        </tr>
+        <tr>
+          <td id="g5"> </td>
+          <td id="g6"> </td>
+          <td id="g7"> </td>
+          <td id="g8"> </td>
+        </tr>
+      </table>
+      <div id="edeck" class="drawdeck"></div>
+      <div id="mdeck" class="drawdeck"></div>
     </div>
 
     <div id="Wait" class="Page">
