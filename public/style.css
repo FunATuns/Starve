@@ -83,14 +83,15 @@ table {
 
 .hand {
 	width: 800px;
-	height: 200px;
+	height: 220px;
 	display: block;
 	position: absolute;
 	background-color: #313131;
 	margin: 0 auto;
 	left: 0;
 	right: 0;
-	overflow-y: scroll;
+	overflow-x: scroll;
+	overflow-y: hidden;
 }
 
 #myhand {
@@ -135,8 +136,8 @@ table {
 	width: 650px;
 	position: relative;
 	display: block;
-	margin: 0 auto;
 	white-space: nowrap;
+	margin: 0 50px;
 }
 
 .cardrow li {
