@@ -8,29 +8,70 @@ var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var players = [];
-
-
-<<<<<<< HEAD
-=======
-var potTotal = 0;
-
-var pot = {
-
-};
-
-var orders = [];
-
-setInterval( function() {
-  lastSpin = Date.now();
-  spin();
-},30000);
->>>>>>> f8abd4b672746e6cc13523a360e2eecad26078f7
+var matches = [];
 
 server.listen(7777, function () {
   console.log('Server listening at port %d', port);
 });
 // Routing
 app.use(express.static(__dirname + '/public'));
+
+var cards = [
+  {
+    name: "Stoat",
+    attack: 1,
+    health: 3,
+    starve: 1,
+    symbol: "none"
+  },
+  {
+    name: "Squirrel",
+    attack: 0,
+    health: 1,
+    starve: 0,
+    symbol: "none"
+  },
+  {
+    name: "Cat",
+    attack: 0,
+    health: 3,
+    starve: 1,
+    symbol: "sacrifice"
+  },
+  {
+    name: "Wolf",
+    attack: 3,
+    health: 3,
+    starve: 2,
+    symbol: "none"
+  },
+  {
+    name: "Grizzly",
+    attack: 4,
+    health: 5,
+    starve: 3,
+    symbol: "none"
+  },
+];
+
+var defaultDeck = [];
+for(var i = 0; i < 30; i++) {
+  if(i < 12) {
+    defaultDeck.push(cards[1]);
+  }
+  else if(i < 15) {
+    defaultDeck.push(cards[2]);
+  }
+  else if(i < 22) {
+    defaultDeck.push(cards[0]);
+  }
+  else if(i < 27) {
+    defaultDeck.push(cards[3]);
+  }
+  else {
+    defaultDeck.push(cards[5]);
+  }
+}
 
 
 io.on('connection', function (socket) {
@@ -41,13 +82,8 @@ console.log('User Connected');
   socket.on('Starting', function (name) {
     var player = newPlayer(socket.id, name);
     players.push(player);
-<<<<<<< HEAD
     socket.emit("You'reIn",player);
-=======
-    socket.emit("You'reIn",player, Date.now() - lastSpin);
-    sendOut("casino");
-    sendOut("drugs");
->>>>>>> f8abd4b672746e6cc13523a360e2eecad26078f7
+    socket.emit("Waiting",true);
   });
 
   socket.on('SendControls', function (data) {
@@ -66,8 +102,6 @@ console.log('User Connected');
 
   });
 
-<<<<<<< HEAD
-=======
   socket.on('CreateOrder', function (data) {
     var drugAmount = Math.floor(data.drugAmount);
 
@@ -95,37 +129,7 @@ console.log('User Connected');
 
   });
 
-  socket.on('BetMore', function (bet) {
-    if(!spinning) {
-      var player = getPlayerByID(socket.id);
-      if(player) {
-        if(!pot[player.username]) {
-          pot[player.username] = 0;
-        }
 
-        if(player.money >= 100) {
-          player.money -= 100;
-          pot[player.username] += 100;
-          potTotal += 100;
-          sendOut("casino");
-        }
-      }
-    }
-  });
-
-  socket.on('BetLess', function (bet) {
-    if(!spinning) {
-      var player = getPlayerByID(socket.id);
-      if(pot[player.username] >= 100) {
-        player.money += 100;
-        pot[player.username] -= 100;
-        potTotal -= 100;
-        sendOut("casino");
-      }
-    }
-  });
-
->>>>>>> f8abd4b672746e6cc13523a360e2eecad26078f7
   socket.on('disconnect', function () {
     for(var i = 0; i < players.length;i++) {
       if(players[i].id == socket.id) {
@@ -135,68 +139,144 @@ console.log('User Connected');
   });
 });
 
+function newMatch (player1, player2) {
+  return {
+    fighters: [getFighter(player1),getFighter(player2)],
+    battlefield: [[null,null,null,null],[null,null,null,null]],
+    turn: 0,
+    whoseTurn: 1,
+    otherTurn: 0,
+    turnCounter: 0,
 
+    startMatch: function () {
+      //let our players know they are in a match
+      sendByID(this.fighters[0].id,"Match",true);
+      sendByID(this.fighters[1].id,"Match",true);
+
+      //shuffle decks
+      shuffle(this.fighters[0].deck);
+      shuffle(this.fighters[1].deck);
+
+      //draw opening hands
+      this.drawCard(0);
+      this.drawCard(0);
+      this.drawCard(0);
+      this.drawCard(1);
+      this.drawCard(1);
+      this.drawCard(1);
+
+
+      this.updatePlayers();
+      this.startTurn();
+    },
+
+    startTurn: function () {
+      //flip the turn
+      this.flipTurn();
+
+      //draw a card
+      this.drawCard(this.whoseTurn);
+
+      //update everyone
+      this.updatePlayers();
+    },
+
+    endTurn: function () {
+      var currentBattlefield = this.battlefield[this.whoseTurn];
+      var enemyBattlefield = this.battlefield[this.otherTurn];
+
+      for(var i = 0; i < 4; i++) {
+        var currentBeast = currentBattlefield[i];
+
+        //do we even have a beast here?
+        if(currentBeast == null) {
+          continue;
+        }
+
+        //lets grab our enemy
+        var currentEnemyBeast = enemyBattlefield[i];
+
+        if(currentEnemyBeast == null) {
+          //opposing enemy is null, so hit face, changing the dev
+          this.fighters[this.whoseTurn].dev += currentBeast.attack;
+          this.fighters[this.otherTurn].dev -= currentBeast.attack;
+        }
+        else if(currentEnemyBeast != null) {
+          //opposing enemy is there, so hit it. Kill it if it loses all it's health
+          currentEnemyBeast.health -= currentBeast.attack;
+
+          //is the beast dead?
+          if(currentEnemyBeast.health <= 0) {
+            //lets kill it
+            this.kill(this.otherTurn,i);
+          }
+        }
+      }
+
+      //done, update then next turn
+      this.updatePlayers();
+      this.startTurn();
+    },
+
+    updatePlayers: function () {
+      io.sockets.connected[this.fighters[0].id].emit("MatchUpdate",this.fighters[0],this.fighters[1].hand.length,this.battlefield[0],this.battlefield[1],this.whoseTurn,this.turnCounter);
+    },
+
+    kill: function (battlefieldIndex, beastIndex) {
+      //kill a beast
+      this.battlefield[battlefieldIndex][beastIndex] = null;
+    },
+
+    flipTurn: function () {
+      this.whoseTurn = this.whoseTurn == 0 ? 1 : 0;
+      this.otherTurn = this.whoseTurn == 0 ? 1 : 0;
+      this.turnCounter = Date.now();
+    },
+
+    drawCard: function(fighterNum) {
+      this.fighters[fighterNum].hand.push( this.fighters[fighterNum].deck[0]);
+      this.fighters[fighterNum].deck.splice(0,1);
+    }
+  };
+}
+
+function getFighter(player) {
+  return {
+    name: player.name,
+    id: player.id,
+    deck: player.deck,
+    hand: [],
+    dev: 0,
+  };
+}
+
+function getBeast(card) {
+
+  var beast =  {
+    name: card.name,
+    attack: card.attack,
+    health: card.health,
+    maxHealth: card.health,
+    symbol: card.symbol
+  };
+
+  //give card properties here
+  
+  return beast;
+}
 
 function newPlayer (id, name) {
   return {
     id: id,
-    username: name,
+    name: name,
     type: "player",
-    x: 5,
-    y: 4,
+    deck: defaultDeck,
+    wins: 0,
+    losses: 0,
+    inMatch: false,
   };
 }
 
-<<<<<<< HEAD
-=======
-function sendOut(type) {
-  if(type == "casino") {
-    for(var i = 0; i < players.length;i++) {
-      sendByID(players[i].id,"CurrentCasino",{myPlayer: players[i], pot: pot, total: potTotal, players: players});
-    }
-  }
-  else if (type == "drugs") {
-    for(var i = 0; i < players.length;i++) {
-      sendByID(players[i].id,"CurrentDrugs",{myPlayer: players[i], orders: orders, players: players});
-    }
-  }
-  else if (type == "players") {
-    sendByID(players[i].id,"CurrentCasino",{players: players});
-  }
-}
-
-function updatePlayer(player, loc) {
-  switch(player.action) {
-    case "tree":
-      var treeTask = getTaskByName(loc,"tree");
-      console.log("GotTask");
-      if(treeTask != undefined) {
-        if(player.treeStuff.turnsChopping == 5) {
-          player.action = "";
-          player.treeStuff.turnsChopping = 0;
-          player.actionMSG = "Done chopping!";
-
-          console.log(TREE.getItemByTree(treeTask.type));
-
-        }
-        else {
-          player.treeStuff.turnsChopping += 1;
-          player.actionMSG = "Chopping...";
-          console.log("Chopping...");
-        }
-      }
-      else
-      {
-        player.action = "";
-        player.treeStuff.turnsChopping = 0;
-      }
-
-
-    break
-  }
-}
-
->>>>>>> f8abd4b672746e6cc13523a360e2eecad26078f7
 function sendByID(id, name,  data) {
   io.sockets.connected[id].emit(name,data);
 }
@@ -231,54 +311,34 @@ function genKey() {
   }
   return key;
 }
-<<<<<<< HEAD
-=======
 
-function getTaskByName(loc, name) {
-  for(var i in loc.tasks) {
-    if(loc.tasks[i].name == name)
-      return loc.tasks[i];
+function matchMake() {
+  var first = null;
+
+  for(var i = 0; i < players.length; i++) {
+    if(!players[i].inMatch && first == null) {
+      first = players[i];
+    }
+    else if(!players[i].inMatch && first !== null && second == null) {
+      players[i].inMatch = true;
+      first.inMatch = true;
+      matches.push(newMatch(first, players[i]));
+
+
+      return;
+    }
   }
 }
 
-function buildWorld () {
-  var currentLoc;
-  for(var i = 0; i < loc.length; i++) {
-    currentLoc = loc[i];
-    currentLoc.drops = [];
+setInterval(matchMake,1000);
 
-    world[i] = currentLoc;
+function shuffle(a) {
+  var j, x, i;
+  for (i = a.length - 1; i > 0; i--) {
+      j = Math.floor(Math.random() * (i + 1));
+      x = a[i];
+      a[i] = a[j];
+      a[j] = x;
   }
-  console.log("Built World");
+  return a;
 }
-
-function priceFromDrug(drug) {
-  if( drug == "weed") {
-    return {cost:100, risk: .1};
-  }
-  else if (drug == "coke") {
-    return {cost:300, risk: .5};
-  }
-  else if (drug == "heroin") {
-    return {cost:600, risk: 1};
-  }
-  else if (drug == "meth") {
-    return {cost:1000, risk: 2};
-  }
-}
-
-function multiplierFromCountry(country) {
-  if( country == "america") {
-    return {cost:1, risk: 1};
-  }
-  else if (country == "canada") {
-    return {cost:2, risk: 1.5};
-  }
-  else if (country == "mexico") {
-    return {cost:3, risk: 4};
-  }
-  else if (country == "china") {
-    return {cost:8, risk: 10};
-  }
-}
->>>>>>> f8abd4b672746e6cc13523a360e2eecad26078f7

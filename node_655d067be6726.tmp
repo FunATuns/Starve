@@ -1,0 +1,188 @@
+// Setup basic express server
+var debug = true;
+
+var port = debug ? 7777 : 27016;
+
+var express = require('express');
+var app = express();
+var server = require('http').createServer(app);
+var io = require('socket.io')(server);
+var players = [];
+var matches = [];
+
+server.listen(7777, function () {
+  console.log('Server listening at port %d', port);
+});
+// Routing
+app.use(express.static(__dirname + '/public'));
+
+
+
+
+io.on('connection', function (socket) {
+  
+console.log('User Connected');
+  // when the client emits 'add user', this listens and executes
+  
+  socket.on('Starting', function (name) {
+    var player = newPlayer(socket.id, name);
+    players.push(player);
+    socket.emit("You'reIn",player, Date.now() - lastSpin);
+    sendOut("casino");
+    sendOut("drugs");
+  });
+
+  socket.on('SendControls', function (data) {
+    for(var i in players) {
+      if(players[i].id == socket.id) {
+        players[i].move = data;
+      }
+    }
+  });
+
+  socket.on('Color', function (data) {
+    var player = getPlayerByID(socket.id);
+    if(player) {
+      player.color = data;
+    }
+
+  });
+
+  socket.on('CreateOrder', function (data) {
+    var drugAmount = Math.floor(data.drugAmount);
+
+    var payout = priceFromDrug(data.drugType).cost;
+    var risk = priceFromDrug(data.drugType).risk;
+
+    payout *= drugAmount;
+    risk *= drugAmount;
+
+    payout *= multiplierFromCountry(data.drugPlace).cost;
+    risk *= multiplierFromCountry(data.drugPlace).risk;
+
+    var runnerPayout = Math.floor((payout/100)*.75) *100 ;
+    var orderPayout =Math.floor((payout/100)*.25) *100;
+
+    var order = {
+      runnerPayout: runnerPayout,
+      orderPayout: orderPayout,
+      risk: risk.toFixed(2),
+      ordererId: socket.id
+    };
+
+    orders.push(order);
+    sendOut("drugs");
+
+  });
+
+
+  socket.on('disconnect', function () {
+    for(var i = 0; i < players.length;i++) {
+      if(players[i].id == socket.id) {
+        players.splice(i,1);
+      }
+    }
+  });
+});
+
+function newMatch (player1, player2) {
+  return {
+    players: [getFighter(player1),getFighter(player2)],
+    battlefield: [[],[]],
+    turn: 0,
+    whoseTurn: 0,
+
+  };
+}
+
+function getFighter(player) {
+  return {
+    name: player.name,
+    id: player.id,
+    deck: player.deck,
+    hand: [],
+    dev: 0,
+  };
+}
+
+function newPlayer (id, name) {
+  return {
+    id: id,
+    name: name,
+    type: "player",
+    deck: [],
+    wins: 0,
+    losses: 0,
+    inMatch: false,
+  };
+}
+
+function sendOut(type) {
+  if(type == "casino") {
+    for(var i = 0; i < players.length;i++) {
+      sendByID(players[i].id,"CurrentCasino",{myPlayer: players[i], pot: pot, total: potTotal, players: players});
+    }
+  }
+  else if (type == "drugs") {
+    for(var i = 0; i < players.length;i++) {
+      sendByID(players[i].id,"CurrentDrugs",{myPlayer: players[i], orders: orders, players: players});
+    }
+  }
+  else if (type == "players") {
+    sendByID(players[i].id,"CurrentCasino",{players: players});
+  }
+}
+
+
+function sendByID(id, name,  data) {
+  io.sockets.connected[id].emit(name,data);
+}
+
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function hasWhiteSpace(str) {
+  return str.indexOf(' ') >= 0;
+}
+
+function getPlayerByCID(cid) {
+  for(var i in players) {
+    if(players[i].cid == cid)
+      return players[i];
+  }
+}
+
+function getPlayerByID(id) {
+  for(var i in players) {
+    if(players[i].id == id)
+      return players[i];
+  }
+}
+
+function genKey() {
+  var key = "";
+  for(var o = 0 ; o< 40; o++) {
+    key += String(getRandomInt(0,9));
+    
+  }
+  return key;
+}
+
+function matchMake() {
+  var first = null;
+
+  for(var i = 0; i < players.length; i++) {
+    if(!players[i].inMatch && first == null) {
+      first = players[i];
+    }
+    else if(!players[i].inMatch && first !== null && second == null) {
+      players[i].inMatch = true;
+      first.inMatch = true;
+      matches.push(newMatch(first, players[i]));
+      return;
+    }
+  }
+}
+
+setInterval(matchMake,1000);
