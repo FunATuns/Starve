@@ -57,7 +57,37 @@ table {
 	margin-top: 35vh;
 	width: 100%;
 	text-align: center;
-	font-size: 56px;
+	font-size: 64px;
+}
+
+#Login input {
+	display: block;
+	position: relative;
+	margin: 1vh auto;
+	border: none;
+	border-bottom: 1px solid white;
+	padding: 10px;
+	background-color: transparent;
+	font-size: 32px;
+	font-family: 'Special Elite', cursive;
+	color: white;
+}
+
+#Login input::placeholder {
+	font-family: 'Special Elite', cursive;
+}
+
+#go {
+	background-color: transparent;
+	border: 1px solid white;
+	display: block;
+	position: relative;
+	font-size: 32px;
+	color: white;
+	font-family: 'Special Elite', cursive;
+	cursor: pointer;
+	padding: 15px 20px;
+	margin: 4vh auto;
 }
 
 .livesarea {
@@ -146,6 +176,7 @@ table {
 	margin: 20px 18px;
 	border: 1px solid white;
 	display: inline-block;
+	position: absolute;
 }
 
 .drawdeck {
@@ -163,4 +194,29 @@ table {
 
 #mdeck {
 	top: 79vh;
+}
+
+.card * {
+	font-size: 15px;
+}
+
+.ctitle {
+	padding: 10px;
+}
+
+.ccimg {
+	position: absolute;
+	top: 45px;
+}
+
+.ca {
+	position: absolute;
+	bottom: 10px;
+	left: 10px;
+}
+
+.ch {
+	position: absolute;
+	bottom: 10px;
+	right: 10px;
 }

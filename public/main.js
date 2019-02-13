@@ -14,6 +14,8 @@ var loginPage = document.getElementById("Login"),
     players = [],
     buildings = [];
 
+switchPages("Match");
+
 function start () {
  var name = document.getElementById("name").value;
  socket.emit('Starting',name);
@@ -29,15 +31,39 @@ function switchPages(page) {
   document.getElementById(page).style.display = "block";
 }
 
-switchPages("Login");
-
 socket.on("You'reIn", function(player){
   switchPages("Wait");
   myplayer = player;
 });
 
-
-
 document.onkeypress = function (evt) {
   console.log(evt.charCode);
 }
+
+/*
+Packet Info (in order):
+myPlayer (object)
+enemyHandSize (int)
+mySideOfBattlefield (array)
+enemySideOfBattlefield (array)
+myTurn (bool)
+turnStartTime (int)
+*/
+socket.on("MatchUpdate", function (myPlayer, enemyHandSize, mySideOfBattlefield, enemySideOfBattlefield, myTurn, turnStartTime ) {
+});
+
+/*
+Packet Info (in order):
+nothing (bool)
+*/
+socket.on("Match", function (data ) {
+  switchPages("Match");
+});
+
+/*
+Packet Info (in order):
+nothing (bool)
+*/
+socket.on("Wait", function (data ) {
+  switchPages("Wait");
+});
