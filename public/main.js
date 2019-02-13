@@ -50,7 +50,11 @@ myTurn (bool)
 turnStartTime (int)
 */
 socket.on("MatchUpdate", function (myPlayer, enemyHandSize, mySideOfBattlefield, enemySideOfBattlefield, myTurn, turnStartTime ) {
+
+
 });
+
+
 
 /*
 Packet Info (in order):
@@ -67,3 +71,5 @@ nothing (bool)
 socket.on("Wait", function (data ) {
   switchPages("Wait");
 });
+
+switchPages("Login");

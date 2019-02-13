@@ -54,25 +54,6 @@ var cards = [
   },
 ];
 
-var defaultDeck = [];
-for(var i = 0; i < 30; i++) {
-  if(i < 12) {
-    defaultDeck.push(cards[1]);
-  }
-  else if(i < 15) {
-    defaultDeck.push(cards[2]);
-  }
-  else if(i < 22) {
-    defaultDeck.push(cards[0]);
-  }
-  else if(i < 27) {
-    defaultDeck.push(cards[3]);
-  }
-  else {
-    defaultDeck.push(cards[5]);
-  }
-}
-
 
 io.on('connection', function (socket) {
   
@@ -144,7 +125,7 @@ console.log('User Connected');
 function newMatch (player1, player2) {
   return {
     fighters: [getFighter(player1),getFighter(player2)],
-    battlefield: [[null,null,null,null],[null,null,null,null]],
+    battlefield: [[getBeast(cards[0]),null,null,null],[null,getBeast(cards[3]),null,null]],
     turn: 0,
     whoseTurn: 1,
     otherTurn: 0,
@@ -320,6 +301,25 @@ function getBeast(card) {
 
 function newPlayer (id, name) {
   console.log("Creating player " + name);
+  var defaultDeck = [];
+
+  for(var i = 0; i < 30; i++) {
+    if(i < 12) {
+      defaultDeck.push(Object.assign({}, cards[1]));
+    }
+    else if(i < 15) {
+      defaultDeck.push(Object.assign({}, cards[2]));
+    }
+    else if(i < 22) {
+      defaultDeck.push(Object.assign({}, cards[0]));
+    }
+    else if(i < 27) {
+      defaultDeck.push(Object.assign({}, cards[3]));
+    }
+    else {
+      defaultDeck.push(Object.assign({}, cards[5]));
+    }
+  }
 
   return {
     id: id,
@@ -380,7 +380,7 @@ function matchMake() {
       players[i].inMatch = true;
       first.inMatch = true;
       matches.push(newMatch(first, players[i]));
-
+      matches[matches.length-1].startMatch();
 
       return;
     }
