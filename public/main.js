@@ -29,7 +29,7 @@ function switchPages(page) {
   document.getElementById(page).style.display = "block";
 }
 
-switchPages("Match");
+switchPages("Login");
 
 socket.on("You'reIn", function(player){
   switchPages("Wait");

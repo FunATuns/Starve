@@ -221,62 +221,11 @@ function newMatch (player1, player2) {
     },
 
     updatePlayers: function () {
-      console.log("Sending out match data");
-
       io.sockets.connected[this.fighters[0].id].emit("MatchUpdate",this.fighters[0],this.fighters[1].hand.length,this.battlefield[0],this.battlefield[1],this.whoseTurn == 0,this.turnCounter);
-      io.sockets.connected[this.fighters[1].id].emit("MatchUpdate",this.fighters[1],this.fighters[0].hand.length,this.battlefield[1],this.battlefield[0],this.whoseTurn == 1,this.turnCounter);
     },
 
-    placeCard: function (playerIndex,handIndex, sacrificeIndexs, battlefieldIndex) {
-      if(playerIndex == this.whoseTurn) {
-        //lets get everything
-        var currentFighter = this.fighters[currentFighter];
-        var cardBeingPlayed = currentFighter.hand[handIndex];
-        var currentBattlefield = this.battlefield[playerIndex];
-
-        for (var o = 0; o < sacrificeIndexs; o++) {
-          if(currentBattlefield[sacrificeIndexs[o]] == null) {
-            //if they try to sacrifice some guy that isn't there GET OUT
-            return;
-          }
-        }
-
-        if(cardBeingPlayed.starve == sacrificeIndexs.length) {
-          //sacrifice the guys
-          for (var o = 0; o < sacrificeIndexs; o++) {
-            this.sacrifice(playerIndex,sacrificeIndexs[o]);
-          }
-
-          //play the card
-          this.playCardFromHand(playerIndex,handIndex,battlefieldIndex);
-        }
-      }
-      else {
-        return;
-      }
-    },
-
-    playCardFromHand: function (playerIndex,handIndex,battlefieldIndex) {
-      //get the card
-      var cardBeingPlayed = this.fighters[playerIndex].hand[handIndex];
-
-      //turn it into a beast onto the battlefield
-      this.battlefield[playerIndex][battlefieldIndex] = getBeast(cardBeingPlayed);
-
-      //remove it from the hand
-      this.fighters[playerIndex].hand.splice(handIndex,1);
-
-      //update our players
-      this.updatePlayers();
-    },
-    
     kill: function (battlefieldIndex, beastIndex) {
       //kill a beast
-      this.battlefield[battlefieldIndex][beastIndex] = null;
-    },
-    
-    sacrifice: function (battlefieldIndex, beastIndex) {
-      //sacrifice a beast
       this.battlefield[battlefieldIndex][beastIndex] = null;
     },
 
