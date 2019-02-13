@@ -44,7 +44,7 @@ q:before, q:after {
 table {
 	border-collapse: collapse;
 	border-spacing: 0;
-}
+} 
 
 .Page {
   width: 100%;
@@ -196,6 +196,10 @@ table {
 	top: 79vh;
 }
 
+.card {
+	position: absolute;
+}
+
 .card * {
 	font-size: 15px;
 }
@@ -219,4 +223,16 @@ table {
 	position: absolute;
 	bottom: 10px;
 	right: 10px;
+}
+
+.gca {
+	top: 138px;
+	position: absolute;
+	left: 10px;
+}
+
+.gch {
+	right: -50px;
+	position: absolute;
+	top: 138px;
 }
