@@ -124,8 +124,12 @@ table {
 	overflow-y: hidden;
 }
 
+#enemyhand {
+	top: -105px;
+}
+
 #myhand {
-	bottom: 0;
+	bottom: 0px;
 }
 
 ::-webkit-scrollbar-button{ 
@@ -151,15 +155,17 @@ table {
 	position: absolute;
 	left: 0;
 	right: 0;
+	top: -60px;
 	display: block;
 	margin: calc(50vh - 161.5px) auto;
 	width: 485px;
 }
 
-#game td {
+#bfoutlines td {
 	width: 120px;
 	height: 160px;
-	border: 1px solid white;
+	border: 1px solid rgb(120,120,120);
+	border-style: dashed;
 }
 
 .cardrow {
@@ -189,7 +195,7 @@ table {
 }
 
 #edeck {
-	top: 5vh;
+	top: calc(5vh - 105px);
 }
 
 #mdeck {
@@ -197,10 +203,23 @@ table {
 }
 
 .card {
+	width: 120px;
+	height: 160px;
+	background-color: white;
 	position: absolute;
+	transition: all .5s ease;
+	border-radius: 5px;
+	box-shadow: -1px 1px 4px  black;
+}
+
+.card:hover {
+	z-index: 5;
+	transform: scale(1.1);
+	box-shadow: -3px 3px 7px  black;
 }
 
 .card * {
+	color: black;
 	font-size: 15px;
 }
 
