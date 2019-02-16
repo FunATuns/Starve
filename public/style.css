@@ -173,16 +173,6 @@ table {
 	position: relative;
 	display: block;
 	white-space: nowrap;
-	margin: 0 50px;
-}
-
-.cardrow li {
-	width: 120px;
-	height: 160px;
-	margin: 20px 18px;
-	border: 1px solid white;
-	display: inline-block;
-	position: absolute;
 }
 
 .drawdeck {
@@ -202,6 +192,16 @@ table {
 	top: 79vh;
 }
 
+.cardback {
+	width: 120px;
+	height: 160px;
+	background-color: #4E4E4E;
+	position: absolute;
+	transition: all .5s ease;
+	border-radius: 5px;
+	box-shadow: -1px 1px 4px  black;
+}
+
 .card {
 	width: 120px;
 	height: 160px;
@@ -212,11 +212,12 @@ table {
 	box-shadow: -1px 1px 4px  black;
 }
 
-.card:hover {
+.card:hover, .cardback:hover, .cardfloat {
 	z-index: 5;
 	transform: scale(1.1);
 	box-shadow: -3px 3px 7px  black;
 }
+
 
 .card * {
 	color: black;
