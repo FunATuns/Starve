@@ -16,15 +16,6 @@ function doAnim() {
     }
   }
 }
-
-function renderAll() {
-  console.log("render all");
-  renderHand(myPlayer.hand);
-  renderEnemyHand(enemyHandSize);
-  renderEmBattlefield(enemySideOfBattlefield);
-  renderMyBattlefield(mySideOfBattlefield);
-}
-
 function endAnim() {
   //cut off the anim we just did
   actualAnim.splice(0,1);
