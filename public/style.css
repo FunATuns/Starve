@@ -279,3 +279,15 @@ table {
 	transition: all .5s ease;
 	opacity: 0;
 }
+
+i {
+	cursor: pointer;
+}
+
+#bell {
+	position: absolute;
+	margin: calc(50vh - 80px) calc(50% - 320px);
+	font-size: 40px;
+	color: #313131;
+	transition: all 1s ease;
+}

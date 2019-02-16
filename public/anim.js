@@ -117,11 +117,13 @@ function anim_drawCard(anim) {
 }
 
 function anim_startTurn(anim){
-  if(myTurn) {
+  if(anim[1]) {
     document.getElementById("myTurn").style.opacity = "1";
+    document.getElementById("bell").style.color = "white";
   }
   else {
     document.getElementById("enTurn").style.opacity = "1";
+    document.getElementById("bell").style.color = "#313131";
   }
   setTimeout(function(){
     document.getElementById("enTurn").style.opacity = "0";

@@ -116,3 +116,7 @@ function getCardBackString(left, top, id, extraStyle = ""){
 
   return "<div style='"+ styleString + "' id='" + id + "' class='cardback'></div>";
 }
+
+function endTurn(){
+  console.log("titty licker")
+}
