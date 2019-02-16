@@ -205,7 +205,7 @@ table {
 .card {
 	width: 120px;
 	height: 160px;
-	background-color: white;
+	background-image: url("images/cardbackground.png");
 	position: absolute;
 	transition: all .5s ease;
 	border-radius: 5px;
@@ -215,17 +215,18 @@ table {
 .card:hover, .cardback:hover, .cardfloat {
 	z-index: 5;
 	transform: scale(1.1);
-	box-shadow: -3px 3px 7px  black;
+	box-shadow: 0px 0px 7px  black;
 }
 
 
 .card * {
 	color: black;
-	font-size: 15px;
+	font-size: 25px;
 }
 
 .ctitle {
 	padding: 10px;
+	font-size: 15px;
 }
 
 .ccimg {
@@ -236,13 +237,13 @@ table {
 .ca {
 	position: absolute;
 	bottom: 10px;
-	left: 10px;
+	left: 20px;
 }
 
 .ch {
 	position: absolute;
 	bottom: 10px;
-	right: 10px;
+	right: 20px;
 }
 
 .gca {

@@ -51,7 +51,7 @@ function anim_drawCard(anim) {
     var currentCard = myPlayer.hand[anim[2]];
 
     //make our card, position it on top of our deck, opacity 0
-    matchPage.innerHTML += getCardString(currentCard.name,currentCard.attack, currentCard.health,"","calc(92.5% - 121px)","79vh","mh" + anim[2],"opacity:0;");
+    matchPage.innerHTML += getCardString(currentCard.name,currentCard.attack, currentCard.health,"images/"+currentCard.name + ".png","calc(92.5% - 121px)","79vh","mh" + anim[2],"opacity:0;");
 
     //get our card
     var currentCardDom = document.getElementById("mh" + anim[2]);

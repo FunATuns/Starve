@@ -11,7 +11,7 @@ function renderAll() {
 function renderHand(hand){
   document.getElementById("myhandwrapper").innerHTML = "";
   for(i = 0; hand.length > i; i++) {
-    document.getElementById("myhandwrapper").innerHTML += getCardString(hand[i].name, hand[i].attack, hand[i].health, hand[i].name + ".png",((i*100)+30) + "px",30 + "px","m" + i);
+    document.getElementById("myhandwrapper").innerHTML += getCardString(hand[i].name, hand[i].attack, hand[i].health, "images/" + hand[i].name + ".png",((i*100)+30) + "px",30 + "px","m" + i);
   }
 }
 
