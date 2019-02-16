@@ -65,19 +65,7 @@ socket.on("MatchUpdate", function (_myPlayer, _enemyHandSize, _mySideOfBattlefie
   _turnStartTime = _turnStartTime;
 
   doAnim();
-  /*
-  renderHand(myPlayer.hand);
-  renderEnemyHand(enemyHandSize);
-  renderEmBattlefield(enemySideOfBattlefield);
-  renderMyBattlefield(mySideOfBattlefield);
-  */
 });
-
-/*
-  ANIMATE OBJECTS
-  DRAW CARD:[animtype (string), myteam (bool), handindex (int)]
-
-*/ 
 
 
 /*

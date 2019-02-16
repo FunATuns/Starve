@@ -1,4 +1,11 @@
 
+
+/*
+  ANIMATE OBJECTS
+  DRAWCARD:[animtype (string), myteam (bool), handindex (int)]
+
+*/ 
+
 function doAnim() {
 
   //are we already animing?
@@ -16,6 +23,7 @@ function doAnim() {
     }
   }
 }
+
 function endAnim() {
   //cut off the anim we just did
   actualAnim.splice(0,1);
@@ -99,6 +107,4 @@ function anim_drawCard(anim) {
       },600);
     },500);
   }
-
-
 }
