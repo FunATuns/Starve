@@ -118,5 +118,7 @@ function getCardBackString(left, top, id, extraStyle = ""){
 }
 
 function endTurn(){
-  console.log("titty licker")
+  if(myTurn) {
+    socket.emit("EndTurn","");
+  }
 }

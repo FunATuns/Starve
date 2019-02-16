@@ -1,9 +1,13 @@
 
 
 /*
-ANIMATE OBJECTS
-DRAWCARD:[animtype (string), myteam (bool), handindex (int)]
-STARTTURN:[animtype (string), myturn (bool)]
+  ANIMATE OBJECTS
+  DRAWCARD:[animtype (string), myteam (bool), handindex (int)]
+  STARTTURN:[animtype (string), myturn (bool)]
+  ENDTURN:[animtype (string)]
+  ATTACKBEAST:[animtype (string), mybeast (bool), battlefieldindex (int)]
+  HITBEAST:[animtype (string), mybeast (bool), battlefieldindex (int), updatedbeast (object)]
+  DIEBEAST:[animtype (string), mybeast (bool), battlefieldindex (int)]
 
 */ 
 
@@ -24,6 +28,12 @@ function doAnim() {
     }
     else if(currentAnim[0] == "startturn") {
       anim_startTurn(currentAnim);
+    }
+    else if(currentAnim[0] == "endturn") {
+      anim_endTurn(currentAnim);
+    }
+    else if(currentAnim[0] == "attackbeast") {
+      anim_attackBeast(currentAnim);
     }
     else {
       endAnim();
@@ -113,6 +123,57 @@ function anim_drawCard(anim) {
         },600);
       },600);
     },500);
+  }
+}
+
+function anim_endTurn(anim){
+  //DINNNNG
+
+  document.getElementById("bell").style.color = "#313131";
+
+  setTimeout(function () {
+    endAnim();
+  }, 500);
+}
+
+function anim_attackBeast(anim){
+  console.log("hit");
+
+  //whose beast is it
+  if(anim[1]) {
+    //ours
+    var beastDOM = document.getElementById("mb" + anim[2]);
+
+    beastDOM.classList.add("cardfloat");
+
+    setTimeout(function () {
+      beastDOM.style.top = (parseInt(beastDOM.style.top.split("px")[0]) - 30) + "px";
+      setTimeout(function () {
+        beastDOM.style.top = (parseInt(beastDOM.style.top.split("px")[0]) + 30) + "px";
+        setTimeout(function () {
+          beastDOM.classList.remove("cardfloat");
+          endAnim();
+        }, 500);
+      }, 500);
+    }, 500);
+
+  }
+  else {
+    //enemies
+    var beastDOM = document.getElementById("eb" + anim[2]);
+    
+    beastDOM.classList.add("cardfloat");
+
+    setTimeout(function () {
+      beastDOM.style.top = (parseInt(beastDOM.style.top.split("px")[0]) + 30) + "px";
+      setTimeout(function () {
+        beastDOM.style.top = (parseInt(beastDOM.style.top.split("px")[0]) - 30) + "px";
+        setTimeout(function () {
+          beastDOM.classList.remove("cardfloat");
+          endAnim();
+        }, 500);
+      }, 500);
+    }, 500);
   }
 }
 

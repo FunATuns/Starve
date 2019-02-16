@@ -67,6 +67,14 @@ console.log('User Connected');
     socket.emit("Waiting",true);
   });
 
+  socket.on('EndTurn', function (data) {
+    var match = getMatchByID(socket.id);
+
+    if(match.fighters[match.whoseTurn].id == socket.id ) {
+      match.endTurn();
+    }
+  });
+
   socket.on('SendControls', function (data) {
     for(var i in players) {
       if(players[i].id == socket.id) {
@@ -86,9 +94,22 @@ console.log('User Connected');
   });
 });
 
+function getMatchByID(id) {
+  for(var i = 0; i < matches.length; i++) {
+    if(matches[i].fighters[0].id == id || matches[i].fighters[1].id == id) {
+      return matches[i];
+    }
+  }
+}
+
 /*
   ANIMATE OBJECTS
-  DRAW CARD:[animtype (string), myteam (bool), handindex (int)]
+  DRAWCARD:[animtype (string), myteam (bool), handindex (int)]
+  STARTTURN:[animtype (string), myturn (bool)]
+  ENDTURN:[animtype (string)]
+  ATTACKBEAST:[animtype (string), mybeast (bool), battlefieldindex (int)]
+  HITBEAST:[animtype (string), mybeast (bool), battlefieldindex (int), updatedbeast (object)]
+  DIEBEAST:[animtype (string), mybeast (bool), battlefieldindex (int)]
 
 */ 
 
@@ -127,6 +148,10 @@ function newMatch (player1, player2) {
       //flip the turn
       this.flipTurn();
 
+      //add animates
+      this.fighters[this.whoseTurn].animate.push( ["startturn", true]);
+      this.fighters[this.whoseTurn == 0 ? 1 : 0].animate.push( ["startturn", false]);
+
       //draw a card
       this.drawCard(this.whoseTurn);
 
@@ -137,6 +162,9 @@ function newMatch (player1, player2) {
     endTurn: function () {
       var currentBattlefield = this.battlefield[this.whoseTurn];
       var enemyBattlefield = this.battlefield[this.otherTurn];
+      
+      this.fighters[this.whoseTurn].animate.push( ["endturn"]);
+      this.fighters[this.whoseTurn == 0 ? 1 : 0].animate.push( ["endturn"]);
 
       for(var i = 0; i < 4; i++) {
         var currentBeast = currentBattlefield[i];
@@ -146,6 +174,9 @@ function newMatch (player1, player2) {
           continue;
         }
 
+        this.fighters[this.whoseTurn].animate.push( ["attackbeast",true,i]);
+        this.fighters[this.whoseTurn == 0 ? 1 : 0].animate.push( ["attackbeast",false,i]);
+
         //lets grab our enemy
         var currentEnemyBeast = enemyBattlefield[i];
 
@@ -153,10 +184,16 @@ function newMatch (player1, player2) {
           //opposing enemy is null, so hit face, changing the dev
           this.fighters[this.whoseTurn].dev += currentBeast.attack;
           this.fighters[this.otherTurn].dev -= currentBeast.attack;
+
+
         }
         else if(currentEnemyBeast != null) {
           //opposing enemy is there, so hit it. Kill it if it loses all it's health
           currentEnemyBeast.health -= currentBeast.attack;
+
+          
+          this.fighters[this.whoseTurn].animate.push( ["hitbeast",false,i,currentEnemyBeast]);
+          this.fighters[this.whoseTurn == 0 ? 1 : 0].animate.push( ["hitbeast",true,i,currentEnemyBeast]);
 
           //is the beast dead?
           if(currentEnemyBeast.health <= 0) {
@@ -228,11 +265,17 @@ function newMatch (player1, player2) {
     kill: function (battlefieldIndex, beastIndex) {
       //kill a beast
       this.battlefield[battlefieldIndex][beastIndex] = null;
+      
+      this.fighters[0].animate.push( ["diebeast",battlefieldIndex == 0,beastIndex]);
+      this.fighters[1].animate.push( ["diebeast",battlefieldIndex == 1,i,beastIndex]);
     },
     
     sacrifice: function (battlefieldIndex, beastIndex) {
       //sacrifice a beast
       this.battlefield[battlefieldIndex][beastIndex] = null;
+
+      this.fighters[0].animate.push( ["diebeast",battlefieldIndex == 0,beastIndex]);
+      this.fighters[1].animate.push( ["diebeast",battlefieldIndex == 1,i,beastIndex]);
     },
 
     flipTurn: function () {
