@@ -257,3 +257,25 @@ table {
 	position: absolute;
 	top: 138px;
 }
+
+#enTurn {
+	position: absolute;
+	width: 100%;
+	text-align: center;
+	margin: 16vh auto;
+	font-size: 26px;
+	color: red;
+	transition: all .5s ease;
+	opacity: 0;
+}
+
+#myTurn {
+	position: absolute;
+	width: 100%;
+	text-align: center;
+	margin: 70vh auto;
+	font-size: 26px;
+	color: white;
+	transition: all .5s ease;
+	opacity: 0;
+}

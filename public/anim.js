@@ -1,8 +1,9 @@
 
 
 /*
-  ANIMATE OBJECTS
-  DRAWCARD:[animtype (string), myteam (bool), handindex (int)]
+ANIMATE OBJECTS
+DRAWCARD:[animtype (string), myteam (bool), handindex (int)]
+STARTTURN:[animtype (string), myturn (bool)]
 
 */ 
 
@@ -20,6 +21,12 @@ function doAnim() {
     //get the anim type and run corresponding functino
     if(currentAnim[0] == "drawcard") {
       anim_drawCard(currentAnim);
+    }
+    else if(currentAnim[0] == "startturn") {
+      anim_startTurn(currentAnim);
+    }
+    else {
+      endAnim();
     }
   }
 }
@@ -107,4 +114,20 @@ function anim_drawCard(anim) {
       },600);
     },500);
   }
+}
+
+function anim_startTurn(anim){
+  if(myTurn) {
+    document.getElementById("myTurn").style.opacity = "1";
+  }
+  else {
+    document.getElementById("enTurn").style.opacity = "1";
+  }
+  setTimeout(function(){
+    document.getElementById("enTurn").style.opacity = "0";
+    document.getElementById("myTurn").style.opacity = "0";
+    setTimeout(function(){
+      endAnim();
+    }, 500);
+  },2000);
 }
