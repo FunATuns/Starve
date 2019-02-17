@@ -138,7 +138,7 @@ function battlefieldClick(battlefieldDOMID) {
   if(!doingAnim) {
     var battlefieldIndex = parseInt(battlefieldDOMID.split("g")[1])-4;
   
-    if(cardOnDeck != -1 && sacrificeMax == sacrifices.length && (mySideOfBattlefield[battlefieldIndex] == null || (sacrifices.includes(battlefieldIndex) && !mySideOfBattlefield[battlefieldIndex].symbol.contains("sacrifice") ))) {
+    if(cardOnDeck != -1 && sacrificeMax == sacrifices.length && (mySideOfBattlefield[battlefieldIndex] == null || (sacrifices.includes(battlefieldIndex) && !mySideOfBattlefield[battlefieldIndex].symbol.includes("sacrifice") ))) {
       socket.emit("PlaceCard",cardOnDeck,battlefieldIndex,sacrifices);
     }
   }

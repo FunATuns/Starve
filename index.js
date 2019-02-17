@@ -126,7 +126,7 @@ function getMatchByID(id) {
 function newMatch (player1, player2) {
   return {
     fighters: [getFighter(player1),getFighter(player2)],
-    battlefield: [[getBeast(cards[0]),getBeast(cards[0]),getBeast(cards[0]),null],[null,getBeast(cards[3]),null,null]],
+    battlefield: [[null,null,null,null],[null,null,null,null]],
     turn: 0,
     whoseTurn: 1,
     otherTurn: 0,
@@ -349,6 +349,7 @@ function getBeast(card) {
     attack: card.attack,
     health: card.health,
     maxHealth: card.health,
+    starve: card.starve,
     symbol: card.symbol
   };
 

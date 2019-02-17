@@ -31,7 +31,7 @@ function renderDeckedBattlefield() {
       for(var i = 0; i < mySideOfBattlefield.length; i++) {
         if(mySideOfBattlefield[i] == null || sacrifices.includes(i)) {
           
-          if(mySideOfBattlefield[i] != null && sacrifices.includes(i) && !mySideOfBattlefield[i].symbol.contains("sacrifice")) { 
+          if(mySideOfBattlefield[i] != null && sacrifices.includes(i) && !mySideOfBattlefield[i].symbol.includes("sacrifice")) { 
             document.getElementById("mb" + i).classList.add("sacrificeChoose");
           }
 
