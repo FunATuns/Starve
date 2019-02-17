@@ -90,25 +90,53 @@ table {
 	margin: 4vh auto;
 }
 
-.livesarea {
+#livesarea {
+	border-radius: 50px;;
+	background-color: #313131;
+	position: absolute;
+	height: 75vh;
+	top: 12.5vh;
+	width: 100px;
+	margin-left: 6%;
+}
+
+
+#mylives {
+	transition: all 0.5s ease-out;
 	border-radius: 100%;
 	background-color: #313131;
 	border: 1px solid white;
 	position: absolute;
 	font-size: 42px;
-	margin-left: 7.5%;
 	height: 100px;
 	width: 100px;
+	left: -1px;
 	text-align: center;
 	line-height: 110px;
+	top: calc(50% - 50px);
+	z-index: 10;
 }
 
-#enemylives {
-	top: 6vh;
+#life {
+	transition: all 0.5s ease-out;
+	border-radius: 100%;
+	border: 1px solid #49CB66;
+	position: absolute;
+	height: 100px;
+	width: 100px;
+	left: -1px;
+	top: 0px;
 }
 
-#mylives {
-	top: 84vh;
+#death {
+	transition: all 0.5s ease-out;
+	border-radius: 100%;
+	border: 1px solid #CB4949;
+	position: absolute;
+	height: 100px;
+	width: 100px;
+	left: -1px;
+	bottom: 0px;
 }
 
 .hand {
@@ -122,6 +150,8 @@ table {
 	right: 0;
 	overflow-x: scroll;
 	overflow-y: hidden;
+
+	transition: all 0.5s ease;
 }
 
 #enemyhand {
@@ -131,6 +161,7 @@ table {
 #myhand {
 	bottom: 0px;
 }
+
 
 ::-webkit-scrollbar-button{ 
 	display: none; 
@@ -159,6 +190,8 @@ table {
 	display: block;
 	margin: calc(50vh - 161.5px) auto;
 	width: 485px;
+	
+	transition: all 0.5s ease;
 }
 
 #bfoutlines td {
@@ -166,7 +199,30 @@ table {
 	height: 160px;
 	border: 1px solid rgb(120,120,120);
 	border-style: dashed;
+	transition: all 0.5s ease;
 }
+
+.placemarker {
+	background-color:#37393a;
+}
+
+.sacrifice  {
+	background-color:#F3C3C3 !important;
+	transform: scale(0.9);
+}
+
+.sacrificeChoose  {
+	background-color:#634242 !important;
+	transform: scale(0.8) !important;
+}
+
+
+.die  {
+	background-color:#634242 !important;
+	transform: scale(0.1) !important;
+	opacity: 0!important;
+}
+
 
 .cardrow {
 	width: 650px;
@@ -205,7 +261,7 @@ table {
 .card {
 	width: 120px;
 	height: 160px;
-	background-image: url("images/cardbackground.png");
+	background-color: white;
 	position: absolute;
 	transition: all .5s ease;
 	border-radius: 5px;
@@ -215,7 +271,13 @@ table {
 .card:hover, .cardback:hover, .cardfloat {
 	z-index: 5;
 	transform: scale(1.1);
-	box-shadow: 0px 0px 7px  black;
+	box-shadow: -3px 3px 7px  black;
+}
+
+.zoombattlefield {
+	z-index: 5;
+	transform: scale(1.1);
+	box-shadow: -3px 3px 7px  black;
 }
 
 
@@ -234,6 +296,18 @@ table {
 	top: 45px;
 }
 
+
+.cblood {
+	position: absolute;
+	top: 10px;
+}
+
+.csym {
+	position: absolute;
+	bottom: 10px;
+	left: calc(50% - 15px);
+}
+
 .ca {
 	position: absolute;
 	bottom: 10px;
@@ -244,18 +318,6 @@ table {
 	position: absolute;
 	bottom: 10px;
 	right: 20px;
-}
-
-.gca {
-	top: 138px;
-	position: absolute;
-	left: 10px;
-}
-
-.gch {
-	right: -50px;
-	position: absolute;
-	top: 138px;
 }
 
 #enTurn {

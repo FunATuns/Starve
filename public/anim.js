@@ -8,13 +8,15 @@
   ATTACKBEAST:[animtype (string), mybeast (bool), battlefieldindex (int)]
   HITBEAST:[animtype (string), mybeast (bool), battlefieldindex (int), updatedbeast (object)]
   DIEBEAST:[animtype (string), mybeast (bool), battlefieldindex (int)]
+  PLACECARD:[animtype (string), mybeast (bool), handindex (int), battlefieldindex (int)]
+  DEV:[animtype (string), dev (int)]
 
 */ 
 
-function doAnim() {
+function doAnim(force = false) {
 
   //are we already animing?
-  if(!doingAnim) {
+  if(!doingAnim || force) {
     doingAnim = true;
   
     console.log(actualAnim);
@@ -35,6 +37,18 @@ function doAnim() {
     else if(currentAnim[0] == "attackbeast") {
       anim_attackBeast(currentAnim);
     }
+    else if(currentAnim[0] == "diebeast") {
+      anim_dieBeast(currentAnim);
+    }
+    else if(currentAnim[0] == "hitbeast") {
+      anim_hitBeast(currentAnim);
+    }
+    else if(currentAnim[0] == "placecard") {
+      anim_placeCard(currentAnim);
+    }
+    else if(currentAnim[0] == "dev") {
+      anim_dev(currentAnim);
+    }
     else {
       endAnim();
     }
@@ -45,17 +59,89 @@ function endAnim() {
   //cut off the anim we just did
   actualAnim.splice(0,1);
 
-  //reset us doing an anim
-  doingAnim = false;
 
   //all anims done?
   if(actualAnim.length == 0) {
+    //reset us doing an anim
+    doingAnim = false;
+
     //yes render everything
     renderAll();
   }
   else {
     //nope, render the next one
-    doAnim();
+    doAnim(true);
+  }
+}
+
+function anim_placeCard(anim) {
+  //check if we are drawing or if our enemy is
+  if(anim[1]) {
+    //we are
+
+    //get the card
+    var currentCard = myPlayer.hand[anim[2]];
+    //get our card
+    var currentCardDom = document.getElementById("mh" + anim[2]);
+
+    //unzoom the battlefield
+    document.getElementById("game").classList.remove("zoombattlefield");
+
+    //are we on deck
+    if(anim[2] == cardOnDeck) {
+
+      currentCardDom.style.left = "calc(50% - 242px + " + ((anim[3] * 121) + 1) +"px)";
+      currentCardDom.style.top = "calc(50vh - 60px)";
+      currentCardDom.classList.remove("cardfloat");
+      setTimeout(function() {
+        currentCardDom.remove();
+        document.getElementById("game").innerHTML += getCardString(mySideOfBattlefield[anim[3]].name, mySideOfBattlefield[anim[3]].starve,  mySideOfBattlefield[anim[3]].attack, mySideOfBattlefield[anim[3]].health,mySideOfBattlefield[anim[3]].symbol,((anim[3]*121)+1) + "px","162px","mb" +anim[3]);
+        cardOnDeck = -1;
+        sacrificeMax = -1;
+        sacrifices = [];
+        renderDeckedBattlefield();
+        endAnim();
+      },600);
+    }
+    else {
+      $("#mh" + anim[2] ).appendTo("#Match");
+      newCardOnDeckDOM.style.left = "calc(50% - 370px + " + anim[2] * 100 +"px)";
+      newCardOnDeckDOM.style.top = "calc(100vh - 190px )";
+
+      setTimeout(function() {
+        currentCardDom.style.left = "calc(50% - 242px + " + ((anim[3] * 121) + 1) +"px)";
+        currentCardDom.style.top = "calc(50vh - 60px)";
+        setTimeout(function() {
+          currentCardDom.remove();
+          document.getElementById("game").innerHTML += getCardString(mySideOfBattlefield[anim[3]].name, mySideOfBattlefield[anim[3]].starve,  mySideOfBattlefield[anim[3]].attack, mySideOfBattlefield[anim[3]].health,mySideOfBattlefield[anim[3]].symbol,((anim[3]*121)+1) + "px","162px","mb" +anim[3]);
+          cardOnDeck = -1;
+          sacrificeMax = -1;
+          sacrifices = [];
+          renderDeckedBattlefield();
+          endAnim();
+        },600);
+      },600);
+    }
+
+  }
+  else {
+    //we are
+    //get our card
+    var currentCardDom = document.getElementById("eh" + anim[2]);
+
+    $("#eh" + anim[2] ).appendTo("#Match");
+    currentCardDom.style.left = "calc(50% - 370px + " + anim[2] * 100 +"px)";
+    currentCardDom.style.top = "-105px";
+
+    setTimeout(function() {
+      currentCardDom.style.left = "calc(50% - 242px + " + ((anim[3] * 121) + 1) +"px)";
+      currentCardDom.style.top = "calc(50vh - 221px )";
+      setTimeout(function() {
+        currentCardDom.remove();
+        document.getElementById("game").innerHTML += getCardString(enemySideOfBattlefield[anim[3]].name, enemySideOfBattlefield[anim[3]].starve, enemySideOfBattlefield[anim[3]].attack, enemySideOfBattlefield[anim[3]].health,enemySideOfBattlefield[anim[3]].symbol,((anim[3]*121)+1) + "px","0px","eb" +anim[3]);
+        endAnim();
+      },600);
+    },600);
   }
 }
 
@@ -68,7 +154,7 @@ function anim_drawCard(anim) {
     var currentCard = myPlayer.hand[anim[2]];
 
     //make our card, position it on top of our deck, opacity 0
-    matchPage.innerHTML += getCardString(currentCard.name,currentCard.attack, currentCard.health,"images/"+currentCard.name + ".png","calc(92.5% - 121px)","79vh","mh" + anim[2],"opacity:0;");
+    matchPage.innerHTML += getCardString(currentCard.name, currentCard.starve,currentCard.attack, currentCard.health,currentCard.symbol,"calc(92.5% - 121px)","79vh","mh" + anim[2],"opacity:0;");
 
     //get our card
     var currentCardDom = document.getElementById("mh" + anim[2]);
@@ -126,10 +212,42 @@ function anim_drawCard(anim) {
   }
 }
 
+function anim_returnDeckedCard(force = false) {
+  if((cardOnDeck != -1 && !doingAnim) || (cardOnDeck != -1 && force)) {
+    doingAnim = true;
+    var storeDeck = cardOnDeck;
+    cardOnDeck = -1;
+
+    sacrifices =  [];
+    sacrificeMax = -1;
+
+    var cardOnDeckDOM = document.getElementById("mh" + storeDeck);
+    cardOnDeckDOM.style.left = "calc(50% - 370px + " + storeDeck * 100 +"px)";
+    cardOnDeckDOM.style.top = "calc(100vh - 190px )";
+    cardOnDeckDOM.classList.remove("cardfloat");
+    setTimeout(function() {
+      //put it in the hand element and make sure its positioned correctly
+      cardOnDeckDOM.style.left = ( (100 * storeDeck) +30) + "px";
+      cardOnDeckDOM.style.top = "30px";
+      $("#mh" + storeDeck).appendTo("#myhandwrapper");
+      doingAnim = false;
+
+    },500);
+
+  
+  }
+}
+
 function anim_endTurn(anim){
   //DINNNNG
 
   document.getElementById("bell").style.color = "#313131";
+  document.getElementById("game").classList.remove("zoombattlefield");
+
+
+
+  anim_returnDeckedCard(true);
+  renderDeckedBattlefield();
 
   setTimeout(function () {
     endAnim();
@@ -149,10 +267,10 @@ function anim_attackBeast(anim){
     setTimeout(function () {
       beastDOM.style.top = (parseInt(beastDOM.style.top.split("px")[0]) - 30) + "px";
       setTimeout(function () {
+        endAnim();
         beastDOM.style.top = (parseInt(beastDOM.style.top.split("px")[0]) + 30) + "px";
         setTimeout(function () {
           beastDOM.classList.remove("cardfloat");
-          endAnim();
         }, 500);
       }, 500);
     }, 500);
@@ -167,12 +285,133 @@ function anim_attackBeast(anim){
     setTimeout(function () {
       beastDOM.style.top = (parseInt(beastDOM.style.top.split("px")[0]) + 30) + "px";
       setTimeout(function () {
+        endAnim();
         beastDOM.style.top = (parseInt(beastDOM.style.top.split("px")[0]) - 30) + "px";
         setTimeout(function () {
           beastDOM.classList.remove("cardfloat");
-          endAnim();
         }, 500);
       }, 500);
+    }, 500);
+  }
+}
+
+function anim_dev(anim){
+  endAnim();
+
+  var liveDOM = document.getElementById("mylives");
+
+  liveDOM.innerText = anim[1];
+
+  if(anim[1] < -20) {
+    anim[1] = -20;
+  }
+  else if(anim[1] > 20) {
+    anim[1] = 20;
+  }
+
+  var adjustedLives = anim[1];
+  adjustedLives = adjustedLives/40;
+  adjustedLives *= -100;
+
+  adjustedLives += 50;
+
+  console.log(adjustedLives);
+
+  liveDOM.style.top = "calc("+ adjustedLives + "% - " + adjustedLives +"px)";
+}
+
+
+function anim_hitBeast(anim){
+  console.log("hit");
+
+  //whose beast is it
+  if(anim[1]) {
+    //ours
+    var beastDOM = document.getElementById("mb" + anim[2]);
+
+    setTimeout(function () {
+      beastDOM.style.transition = "transform 0.1s ease";
+      beastDOM.style.transform = "rotate(2deg)";
+      setTimeout(function () {
+        beastDOM.style.transform = "rotate(-2deg)";
+        setTimeout(function () {
+          beastDOM.style.transform = "rotate(2deg)";
+          setTimeout(function () {
+            beastDOM.style.transform = "rotate(-2deg)";
+            setTimeout(function () {
+              beastDOM.style.transform = "rotate(0deg)";
+              setTimeout(function () {
+                beastDOM.remove();
+                document.getElementById("game").innerHTML += getCardString(anim[3].name, anim[3].starve, anim[3].attack, anim[3].health,anim[3].symbol,((anim[2]*121)+1) + "px","162px","mb" +anim[2]);
+
+                
+                setTimeout(function () {
+                  endAnim();
+                }, 200);
+              }, 200);
+            }, 100);
+          }, 100);
+        }, 100);
+      }, 100);
+    }, 100);
+
+  }
+  else {
+    var beastDOM = document.getElementById("eb" + anim[2]);
+    
+    setTimeout(function () {
+      beastDOM.style.transition = "transform 0.1s ease";
+      beastDOM.style.transform = "rotate(2deg)";
+      setTimeout(function () {
+        beastDOM.style.transform = "rotate(-2deg)";
+        setTimeout(function () {
+          beastDOM.style.transform = "rotate(2deg)";
+          setTimeout(function () {
+            beastDOM.style.transform = "rotate(-2deg)";
+            setTimeout(function () {
+              beastDOM.style.transform = "rotate(0deg)";
+              setTimeout(function () {
+                beastDOM.remove();
+                document.getElementById("game").innerHTML += getCardString(anim[3].name, anim[3].starve, anim[3].attack, anim[3].health,anim[3].symbol,((anim[2]*121)+1) + "px","0px","eb" +anim[2]);
+
+                setTimeout(function () {
+                  endAnim();
+                }, 200);
+              }, 200);
+            }, 100);
+          }, 100);
+        }, 100);
+      }, 100);
+    }, 100);
+  }
+}
+
+
+function anim_dieBeast(anim){
+  console.log("hit");
+
+  //whose beast is it
+  if(anim[1]) {
+    //ours
+    var beastDOM = document.getElementById("mb" + anim[2]);
+
+    beastDOM.classList.add("die");
+
+    setTimeout(function () {
+      beastDOM.remove();
+      endAnim();
+    }, 500);
+
+  }
+  else {
+    //enemies
+    var beastDOM = document.getElementById("eb" + anim[2]);
+    
+    beastDOM.classList.add("die");
+
+    setTimeout(function () {
+      beastDOM.remove();
+      endAnim();
     }, 500);
   }
 }

@@ -15,8 +15,11 @@
     </div>
     
     <div id="Match" class="Page">
-      <div id="enemylives" class="livesarea">52</div>
-      <div id="mylives" class="livesarea">3</div>
+      <div id="livesarea">
+          <div id="mylives" >0</div> 
+          <div id="death" ></div> 
+          <div id="life" ></div> 
+      </div>
       <section id="enemyhand" class="hand">
         <div id="enemyhandwrapper" class="cardrow">
         </div>
@@ -30,16 +33,16 @@
       <div id="game">
         <table id="bfoutlines">
           <tr>
-            <td id="g0"> </td>
+            <td id="g0" > </td>
             <td id="g1"> </td>
             <td id="g2"> </td>
             <td id="g3"> </td>
           </tr>
           <tr>
-            <td id="g4"> </td>
-            <td id="g5"> </td>
-            <td id="g6"> </td>
-            <td id="g7"> </td>
+            <td id="g4" onclick="battlefieldClick(this.id)"> </td>
+            <td id="g5" onclick="battlefieldClick(this.id)"> </td>
+            <td id="g6" onclick="battlefieldClick(this.id)"> </td>
+            <td id="g7" onclick="battlefieldClick(this.id)"> </td>
           </tr>
         </table>
       </div>
@@ -61,6 +64,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.16/p5.js"></script>
     <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
     <script src="maps/world.js"></script>
+    <script src="aug.js"></script>
     <script src="main.js"></script>
     <script src="anim.js"></script>
     <script src="render.js"></script>
