@@ -26,39 +26,45 @@ function doAnim(force = false) {
     var currentAnim = actualAnim[0];
 
     //get the anim type and run corresponding functino
-    if(currentAnim[0] == "drawcard") {
-      anim_drawCard(currentAnim);
+    try {
+      if(currentAnim[0] == "drawcard") {
+        anim_drawCard(currentAnim);
+      }
+      else if(currentAnim[0] == "startturn") {
+        anim_startTurn(currentAnim);
+      }
+      else if(currentAnim[0] == "endturn") {
+        anim_endTurn(currentAnim);
+      }
+      else if(currentAnim[0] == "attackbeast") {
+        anim_attackBeast(currentAnim);
+      }
+      else if(currentAnim[0] == "diebeast") {
+        anim_dieBeast(currentAnim);
+      }
+      else if(currentAnim[0] == "hitbeast") {
+        anim_hitBeast(currentAnim);
+      }
+      else if(currentAnim[0] == "placecard") {
+        anim_placeCard(currentAnim);
+      }
+      else if(currentAnim[0] == "addcard") {
+        anim_addCard(currentAnim);
+      }
+      else if(currentAnim[0] == "gamedone") {
+        anim_gameDone(currentAnim);
+      }
+      else if(currentAnim[0] == "dev") {
+        anim_dev(currentAnim);
+      }
+      else {
+        endAnim();
+      }
     }
-    else if(currentAnim[0] == "startturn") {
-      anim_startTurn(currentAnim);
-    }
-    else if(currentAnim[0] == "endturn") {
-      anim_endTurn(currentAnim);
-    }
-    else if(currentAnim[0] == "attackbeast") {
-      anim_attackBeast(currentAnim);
-    }
-    else if(currentAnim[0] == "diebeast") {
-      anim_dieBeast(currentAnim);
-    }
-    else if(currentAnim[0] == "hitbeast") {
-      anim_hitBeast(currentAnim);
-    }
-    else if(currentAnim[0] == "placecard") {
-      anim_placeCard(currentAnim);
-    }
-    else if(currentAnim[0] == "addcard") {
-      anim_addCard(currentAnim);
-    }
-    else if(currentAnim[0] == "gamedone") {
-      anim_gameDone(currentAnim);
-    }
-    else if(currentAnim[0] == "dev") {
-      anim_dev(currentAnim);
-    }
-    else {
+    catch(err) {
       endAnim();
     }
+    
   }
 }
 
