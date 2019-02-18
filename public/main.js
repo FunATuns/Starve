@@ -171,6 +171,10 @@ function getCardText(cardName) {
   else if(cardName=="Stoat") {return "The Noble Stoat: The equivilant to animal fodder. Good to use and dispose."}
   else if(cardName=="Squirrel") {return "The Minute Stoat: A small worthless creature, begging to be sacrificed."}
   else if(cardName=="Wolf") {return "The Angry Wolf: A predator good for disposing of smaller animals."}
+  else if(cardName=="Beehive") {return "The Stout Beehive: A home to the most annoying insects. Gives you a bee everytime it's attacked."}
+  else if(cardName=="Bee") {return "The Hyper Bee: A small creature that attacks the opponent directly."}
+  else if(cardName=="Rabbit") {return "The Stupid Rabbit: A worthless creature good for absorbing shots."}
+  else if(cardName=="Warren") {return "The Compact Warren: A home for all sorts of vermin. Gives you 2 rabbits when played."}
 }
 
 function getCardString(name, starve, attack, health, symbol,left, top, id, extraStyle = ""){
