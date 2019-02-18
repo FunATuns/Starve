@@ -33,14 +33,14 @@ var cards = [
   },
   {
     name: "Cat",
-    attack: 0,
-    health: 3,
+    attack: 1,
+    health: 2,
     starve: 1,
     symbol: "sacrifice"
   },
   {
     name: "Wolf",
-    attack: 3,
+    attack: 2,
     health: 3,
     starve: 2,
     symbol: "none"
@@ -48,9 +48,37 @@ var cards = [
   {
     name: "Grizzly",
     attack: 4,
-    health: 5,
+    health: 4,
     starve: 3,
     symbol: "none"
+  },
+  {
+    name: "Warren",
+    attack: 0,
+    health: 3,
+    starve: 1,
+    symbol: "2card"
+  },
+  {
+    name: "Beehive",
+    attack: 0,
+    health: 3,
+    starve: 1,
+    symbol: "addcard"
+  },
+  {
+    name: "Rabbit",
+    attack: 0,
+    health: 2,
+    starve: 0,
+    symbol: "none"
+  },
+  {
+    name: "Bee",
+    attack: 1,
+    health: 1,
+    starve: 0,
+    symbol: "fly"
   },
 ];
 
@@ -80,6 +108,20 @@ console.log('User Connected');
 
     if(match.fighters[match.whoseTurn].id == socket.id ) {
       match.placeCard(match.whoseTurn,card,sacrificeIndexs,endLoc);
+    }
+  });
+
+  socket.on('Pick', function (i) {
+    var player = getPlayerByID(socket.id);
+
+    player.deck[i] = player.picks[0];
+    player.picks.splice(0,1);
+    if(player.picks.length == 0) {
+      player.inPick = false;
+      socket.emit("Waiting",true);
+    }
+    else {
+      sendByID(player.id,"Picks",player);
     }
   });
 
@@ -118,8 +160,10 @@ function getMatchByID(id) {
   ATTACKBEAST:[animtype (string), mybeast (bool), battlefieldindex (int)]
   HITBEAST:[animtype (string), mybeast (bool), battlefieldindex (int), updatedbeast (object)]
   DIEBEAST:[animtype (string), mybeast (bool), battlefieldindex (int)]
+  ADDCARD:[animtype (string), mycard (bool), handindex (int), card (object)]
   PLACECARD:[animtype (string), mybeast (bool), handindex (int), battlefieldindex (int)]
   DEV:[animtype (string), dev (int)]
+  GAMEDONE:[animtype (string), win (bool)]
 
 */ 
 
@@ -131,11 +175,12 @@ function newMatch (player1, player2) {
     whoseTurn: 1,
     otherTurn: 0,
     turnCounter: 0,
+    matchID: genKey(),
 
     startMatch: function () {
       //let our players know they are in a match
-      sendByID(this.fighters[0].id,"Match",true);
-      sendByID(this.fighters[1].id,"Match",true);
+      sendByID(this.fighters[0].id,"Match",this.fighters[1].name);
+      sendByID(this.fighters[1].id,"Match",this.fighters[0].name);
 
       //shuffle decks
       shuffle(this.fighters[0].deck);
@@ -194,7 +239,7 @@ function newMatch (player1, player2) {
           //lets grab our enemy
           var currentEnemyBeast = enemyBattlefield[i];
         
-          if(currentEnemyBeast == null) {
+          if(currentEnemyBeast == null || currentBeast.symbol.includes("fly")) {
             //opposing enemy is null, so hit face, changing the dev
             this.fighters[this.whoseTurn].dev += currentBeast.attack;
             this.fighters[this.otherTurn].dev -= currentBeast.attack;
@@ -212,6 +257,10 @@ function newMatch (player1, player2) {
             
             this.fighters[this.whoseTurn].animate.push( ["hitbeast",false,i,Object.assign({}, currentEnemyBeast)]);
             this.fighters[this.whoseTurn == 0 ? 1 : 0].animate.push( ["hitbeast",true,i,Object.assign({}, currentEnemyBeast)]);
+
+            if(currentEnemyBeast.name == "Beehive") {
+              this.addCard(this.otherTurn,"Bee");
+            }
   
             //is the beast dead?
             if(currentEnemyBeast.health <= 0) {
@@ -223,8 +272,68 @@ function newMatch (player1, player2) {
       }
 
       //done, update then next turn
-      this.updatePlayers();
-      this.startTurn();
+      this.checkWin();
+    },
+
+    checkWin: function () {
+      if(this.fighters[0].dev <= -2) {
+        this.fighters[1].animate.push( ["gamedone",true]);
+        this.fighters[0].animate.push( ["gamedone",false]);
+
+        var player0 = getPlayerByID(this.fighters[0].id);
+        var player1 = getPlayerByID(this.fighters[1].id);
+        console.log(player0);
+
+        player0.inMatch = false;
+        player1.inMatch = false;
+        player0.inPick = true;
+        player1.inPick = true;
+        
+        player0.picks = getPicks();
+        player1.picks = getPicks();
+        sendByID(player0.id,"Picks",player0);
+        sendByID(player1.id,"Picks",player1);
+        this.updatePlayers();
+        
+        for(var i = 0; i < matches; i++) {
+          if(matches[i].matchID == this.matchID) {
+            matches.splice(i,1);
+            return;
+          }
+        }
+      }
+      else if(this.fighters[1].dev <= -2) {
+        this.fighters[1].animate.push( ["gamedone",false]);
+        this.fighters[0].animate.push( ["gamedone",true]);
+        
+        var player0 = getPlayerByID(this.fighters[0].id);
+        var player1 = getPlayerByID(this.fighters[1].id);
+
+        console.log(player0);
+
+        player0.inMatch = false;
+        player1.inMatch = false;
+        player0.inPick = true;
+        player1.inPick = true;
+
+        player0.picks = getPicks();
+        player1.picks = getPicks();
+        sendByID(player0.id,"Picks",player0);
+        sendByID(player1.id,"Picks",player1);
+        this.updatePlayers();
+
+        for(var i = 0; i < matches; i++) {
+          if(matches[i].matchID == this.matchID) {
+            matches.splice(i,1);
+            return;
+          }
+        }
+      }
+      else {
+        this.updatePlayers();
+        this.startTurn();
+      }
+
     },
 
     updatePlayers: function () {
@@ -245,6 +354,10 @@ function newMatch (player1, player2) {
         var currentFighter = this.fighters[playerIndex];
         var cardBeingPlayed = currentFighter.hand[handIndex];
         var currentBattlefield = this.battlefield[playerIndex];
+
+        if(cardBeingPlayed == undefined) {
+          return;
+        }
 
 
         for (var o = 0; o < sacrificeIndexs.length; o++) {
@@ -275,6 +388,22 @@ function newMatch (player1, player2) {
       }
     },
 
+    addCard: function (playerIndex,cardName) {
+      var cardIndex = 0;
+
+      for(var i = 0; i < cards.length; i++) {
+        if(cards[i].name == cardName) {
+          cardIndex = i;
+          break;
+        }
+      }
+
+      this.fighters[playerIndex].hand.push(Object.assign({},cards[cardIndex]));
+
+      this.fighters[0].animate.push( ["addcard",playerIndex == 0,this.fighters[playerIndex].hand.length-1,playerIndex == 0 ? Object.assign({},cards[cardIndex]) : null]);
+      this.fighters[1].animate.push( ["addcard",playerIndex == 1,this.fighters[playerIndex].hand.length-1,playerIndex == 1 ? Object.assign({},cards[cardIndex]) : null]);
+    },
+
     playCardFromHand: function (playerIndex,handIndex,battlefieldIndex) {
       //get the card
       var cardBeingPlayed = this.fighters[playerIndex].hand[handIndex];
@@ -282,6 +411,12 @@ function newMatch (player1, player2) {
       //animates
       this.fighters[0].animate.push( ["placecard",playerIndex == 0,handIndex,battlefieldIndex]);
       this.fighters[1].animate.push( ["placecard",playerIndex == 1,handIndex, battlefieldIndex]);
+
+      if(cardBeingPlayed.name == "Warren") {
+        //add rabbits
+        this.addCard(playerIndex,"Rabbit");
+        this.addCard(playerIndex,"Rabbit");
+      }
 
       //turn it into a beast onto the battlefield
       this.battlefield[playerIndex][battlefieldIndex] = getBeast(cardBeingPlayed);
@@ -332,14 +467,20 @@ function newMatch (player1, player2) {
 }
 
 function getFighter(player) {
-  return {
+ var fighter = {
     name: player.name,
     id: player.id,
-    deck: player.deck,
+    deck: [],
     animate: [],
     hand: [],
     dev: 0,
   };
+
+  for(var i in player.deck) {
+    fighter.deck.push(Object.assign({},player.deck[i]));
+  }
+
+  return fighter;
 }
 
 function getBeast(card) {
@@ -362,17 +503,17 @@ function newPlayer (id, name) {
   console.log("Creating player " + name);
   var defaultDeck = [];
 
-  for(var i = 0; i < 20; i++) {
-    if(i < 8) {
+  for(var i = 0; i < 30; i++) {
+    if(i < 10) {
       defaultDeck.push(Object.assign({}, cards[1]));
     }
-    else if(i < 12) {
+    else if(i < 15) {
       defaultDeck.push(Object.assign({}, cards[2]));
     }
-    else if(i < 16) {
+    else if(i < 23) {
       defaultDeck.push(Object.assign({}, cards[0]));
     }
-    else if(i < 19) {
+    else if(i < 27) {
       defaultDeck.push(Object.assign({}, cards[3]));
     }
     else {
@@ -388,6 +529,7 @@ function newPlayer (id, name) {
     wins: 0,
     losses: 0,
     inMatch: false,
+    inPick: false,
   };
 }
 
@@ -430,7 +572,7 @@ function matchMake() {
   var first = null;
 
   for(var i = 0; i < players.length; i++) {
-    if(!players[i].inMatch && first == null) {
+    if(!players[i].inMatch && !players[i].inPick &&  first == null) {
       first = players[i];
     }
     else if(!players[i].inMatch && first !== null ) {
@@ -457,4 +599,15 @@ function shuffle(a) {
       a[j] = x;
   }
   return a;
+}
+
+function getPicks() {
+
+  return [
+    Object.assign({}, cards[getRandomInt(0,cards.length-1)]),
+    Object.assign({}, cards[getRandomInt(0,cards.length-1)]),
+    Object.assign({}, cards[getRandomInt(0,cards.length-1)]),
+    Object.assign({}, cards[getRandomInt(0,cards.length-1)]),
+    Object.assign({}, cards[getRandomInt(0,cards.length-1)])
+  ];
 }

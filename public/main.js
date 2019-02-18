@@ -12,10 +12,12 @@ var loginPage = document.getElementById("Login"),
     sacrifices = [],
     sacrificeMax = -1,
     myPlayer = {},
+    myOverPlayer = {},
     actualAnim = [],
     enemyHandSize,
     mySideOfBattlefield,
     enemySideOfBattlefield,
+    cardBeingPicked = false,
     doingAnim = false;
 
 switchPages("Login");
@@ -36,7 +38,7 @@ function switchPages(page) {
 }
 
 socket.on("You'reIn", function(player){
-  switchPages("Wait");
+  switchPages("Pick");
   myplayer = player;
 });
 
@@ -63,6 +65,8 @@ socket.on("MatchUpdate", function (_myPlayer, _enemyHandSize, _mySideOfBattlefie
   myTurn = _myTurn;
   turnStartTime = _turnStartTime;
 
+  document.getElementById("myname").innerText = myPlayer.name;
+
   doAnim();
 });
 
@@ -72,6 +76,7 @@ Packet Info (in order):
 nothing (bool)
 */
 socket.on("Match", function (data ) {
+  document.getElementById("enemyname").innerText = data;
   switchPages("Match");
 });
 
@@ -79,10 +84,94 @@ socket.on("Match", function (data ) {
 Packet Info (in order):
 nothing (bool)
 */
-socket.on("Wait", function (data ) {
+socket.on("Waiting", function (data ) {
   switchPages("Wait");
 });
 
+
+socket.on("Picks", function (data ) {
+  console.log(data.deck);
+  myOverPlayer = data;
+
+  document.getElementById("pickdeck").innerHTML = "<div id='widething'> </div>";
+  for(var i = 0; i < myOverPlayer.deck.length; i++) {
+    var card = myOverPlayer.deck[i];
+
+    if(i < 15) {
+      document.getElementById("pickdeck").innerHTML += getCardString(card.name, card.starve, card.attack, card.health, card.symbol,((i*90)+30) + "px",30 + "px","pd" + i);
+
+    } 
+    else {
+      document.getElementById("pickdeck").innerHTML += getCardString(card.name, card.starve, card.attack, card.health, card.symbol,(((i-15)*90)+30) + "px",210 + "px","pd" + i);
+    }
+
+  }
+});
+
+function callForest() {
+  var nextPick = myOverPlayer.picks[0];
+
+  console.log(myOverPlayer.picks);
+
+  if(!doingAnim && !cardBeingPicked) {
+    doingAnim = true;
+    cardBeingPicked = true;
+    pickPage.innerHTML += getCardString(nextPick.name,nextPick.starve, nextPick.attack, nextPick.health, nextPick.symbol, "calc(50% - 60px)","110px","pickcard","z-index: 1000;");
+    var forestDOM = document.getElementById("forest");
+    var cardDescWrapDOM = document.getElementById("carddescwrapper");
+    var cardDescDOM = document.getElementById("carddesc");
+    var newPickDom = document.getElementById("pickcard");
+
+    forestDOM.style.left = "calc(50% - 180px)";
+    forestDOM.style.transitionDuration = "0.1s";
+
+    cardDescDOM.innerHTML = getCardText(nextPick.name) + "<br><br>Click a card in your deck to replace";
+
+    newPickDom.classList.add("die");
+
+    setTimeout(function () {
+      forestDOM.style.transform = "rotate(-3deg) scale(1.1)";
+      setTimeout(function () {
+        forestDOM.style.transform = "rotate(3deg) scale(1.1)";
+        setTimeout(function () {
+          forestDOM.style.transform = "rotate(-3deg) scale(1.1)";
+          setTimeout(function () {
+            forestDOM.style.transform = "rotate(3deg) scale(1.1)";
+            setTimeout(function () {
+              forestDOM.style.transform = "rotate(-3deg) scale(1.1)";
+              setTimeout(function () {
+                forestDOM.style.transform = "";
+                forestDOM.style.transitionDuration = "0.5s";
+                setTimeout(function () {
+                  newPickDom.classList.remove("die");
+                  newPickDom.classList.add("float");
+                  setTimeout(function () {
+                    forestDOM.style.left = "calc(50% - 360px)";
+
+                    newPickDom.style.left = "calc(50% + 120px)";
+                    newPickDom.style.top = "30px";
+
+                    cardDescWrapDOM.style.opacity = "1";
+
+                    doingAnim = false;
+                  },700);
+                },500);
+              },100);
+            },100);
+          },100);
+        },100);
+      },100);
+    },100);
+  }
+}
+
+function getCardText(cardName) {
+  if(cardName=="Cat") {return "The Proud Cat: It doesn't die when sacrificed, as it is resilient and listens to no one."}
+  else if(cardName=="Grizzly") {return "The Vulgar Grizzly: A brutish animal, one that is controlled easily."}
+  else if(cardName=="Stoat") {return "The Noble Stoat: The equivilant to animal fodder. Good to use and dispose."}
+  else if(cardName=="Squirrel") {return "The Minute Stoat: A small worthless creature, begging to be sacrificed."}
+  else if(cardName=="Wolf") {return "The Angry Wolf: A predator good for disposing of smaller animals."}
+}
 
 function getCardString(name, starve, attack, health, symbol,left, top, id, extraStyle = ""){
 
@@ -147,7 +236,44 @@ function battlefieldClick(battlefieldDOMID) {
 
 
 function clickCard (cardDOMID) {
-  if(myTurn && !doingAnim && cardDOMID.startsWith("mh")) {
+  if(cardBeingPicked && !doingAnim) {
+    var forestDOM = document.getElementById("forest");
+    var cardDescWrapDOM = document.getElementById("carddescwrapper");
+    var cardDescDOM = document.getElementById("carddesc");
+    var newPickDom = document.getElementById("pickcard");
+    var replaceDOM = document.getElementById(cardDOMID);
+    var card = myOverPlayer.picks[0];
+    var i = parseInt(cardDOMID.split("pd")[1]);
+
+    newPickDom.style.opacity = 0;
+    cardDescWrapDOM.style.opacity = 0;
+    replaceDOM.style.opacity = 0;
+
+    setTimeout(function() {
+      replaceDOM.remove();
+      newPickDom.remove();
+      if(i < 15) {
+        document.getElementById("pickdeck").innerHTML += getCardString(card.name, card.starve, card.attack, card.health, card.symbol,((i*90)+30) + "px",30 + "px","pd" + i,"opacity:0");
+      } 
+      else {
+        document.getElementById("pickdeck").innerHTML += getCardString(card.name, card.starve, card.attack, card.health, card.symbol,(((i-15)*90)+30) + "px",210 + "px","pd" + i,"opacity:0");
+      }
+      replaceDOM = document.getElementById(cardDOMID);
+      setTimeout(function() {
+        replaceDOM.style.opacity = "1";
+        forestDOM.style.left = "calc(50% - 180px)";
+        socket.emit("Pick",i);
+        setTimeout(function() {
+          replaceDOM.style.opacity = "1";
+          forestDOM.style.left = "calc(50% - 180px)";
+          doingAnim = false;
+          cardBeingPicked = false;
+        },500);
+      },100);
+    },500);
+
+  }
+  else if(myTurn && !doingAnim && cardDOMID.startsWith("mh")) {
     doingAnim = true;
     anim_returnDeckedCard(true);
     
@@ -168,13 +294,15 @@ function clickCard (cardDOMID) {
     newCardOnDeckDOM.style.top = "calc(100vh - 190px )";
     newCardOnDeckDOM.classList.add("cardfloat");
     setTimeout(function() {
+      newCardOnDeckDOM.style.transition = "all 0.2s ease";
       newCardOnDeckDOM.style.left = "calc(50% - 400px )";
       newCardOnDeckDOM.style.top = "calc(50vh + 50px)";
        setTimeout(function() {
+        newCardOnDeckDOM.style.transition = "all 0.5s ease";
         cardOnDeck = handID;
         doingAnim = false;
-      },300);
-    },200);
+      },200);
+    },100);
   }
   else if(myTurn && !doingAnim && cardDOMID.startsWith("mb")) {
     var battlefieldID = parseInt(cardDOMID.split("mb")[1]);

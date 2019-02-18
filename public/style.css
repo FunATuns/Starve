@@ -139,6 +139,29 @@ table {
 	bottom: 0px;
 }
 
+#pickdeck {
+	width: 100%;
+	height: 420px;
+	display: block;
+	position: absolute;
+	background-color: #313131;
+	left: 0;
+	bottom: 0;
+	overflow-x: scroll;
+	overflow-y: hidden;
+
+	transition: all 0.5s ease;
+}
+
+#widething {
+	display: block;
+	position:absolute;
+	width: 1440px;
+	height: 1px;
+	left: 0px;
+	top: 0px;
+}
+
 .hand {
 	width: 800px;
 	height: 220px;
@@ -192,6 +215,52 @@ table {
 	width: 485px;
 	
 	transition: all 0.5s ease;
+}
+
+#forest {
+	width: 360px;
+	height: 320px;
+	background-color: white;
+	background-image: url("images/forest.png");
+	position: absolute;
+	transition: all .5s ease;
+	cursor:copy;
+	top:30px;
+	right: calc(50% - 180px);
+	border-radius: 5px;
+	box-shadow: -1px 1px 4px  black;
+
+}
+
+#carddescwrapper {
+	width: 360px;
+	height: 160px;
+	position: absolute;
+	transition: all .5s ease;
+	top:190px;
+
+	left: 50%;
+	opacity: 0;
+
+}
+
+#carddesc {
+	width: 300px;
+	height: 130px;
+	color: white;
+	font-size: 20px;
+	position: absolute;
+	transition: all .5s ease;
+	top:0;
+
+	left: 30px;
+	top: 30px;
+}
+
+#forest:hover {
+	z-index: 5;
+	transform: scale(1.1);
+	box-shadow: -3px 3px 7px  black;
 }
 
 #bfoutlines td {
@@ -248,6 +317,22 @@ table {
 	top: 79vh;
 }
 
+#myname {
+	position: absolute;
+	font-size: 30px;
+	color: white;
+	bottom:  30px;
+	left: 30px;
+}
+
+#enemyname {
+	position: absolute;
+	font-size: 30px;
+	color: white;
+	top:  30px;
+	left: 30px;
+}
+
 .cardback {
 	width: 120px;
 	height: 160px;
@@ -262,6 +347,7 @@ table {
 	width: 120px;
 	height: 160px;
 	background-color: white;
+	background-image: url("images/cardoverlay.png");
 	position: absolute;
 	transition: all .5s ease;
 	border-radius: 5px;

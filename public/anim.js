@@ -7,6 +7,7 @@
   ENDTURN:[animtype (string)]
   ATTACKBEAST:[animtype (string), mybeast (bool), battlefieldindex (int)]
   HITBEAST:[animtype (string), mybeast (bool), battlefieldindex (int), updatedbeast (object)]
+  ADDCARD:[animtype (string), mycard (bool), handindex (int), card (object)]
   DIEBEAST:[animtype (string), mybeast (bool), battlefieldindex (int)]
   PLACECARD:[animtype (string), mybeast (bool), handindex (int), battlefieldindex (int)]
   DEV:[animtype (string), dev (int)]
@@ -46,6 +47,12 @@ function doAnim(force = false) {
     else if(currentAnim[0] == "placecard") {
       anim_placeCard(currentAnim);
     }
+    else if(currentAnim[0] == "addcard") {
+      anim_addCard(currentAnim);
+    }
+    else if(currentAnim[0] == "gamedone") {
+      anim_gameDone(currentAnim);
+    }
     else if(currentAnim[0] == "dev") {
       anim_dev(currentAnim);
     }
@@ -71,6 +78,56 @@ function endAnim() {
   else {
     //nope, render the next one
     doAnim(true);
+  }
+}
+
+function anim_gameDone(anim) {
+  if(anim[1]) {
+    document.getElementById("myTurn").innerText = "You have won!";
+    document.getElementById("myTurn").style.opacity = "1";
+  }
+  else {
+    document.getElementById("myTurn").innerText = "You lost :(";
+    document.getElementById("myTurn").style.opacity = "1";
+  }
+
+  cardOnDeck = -1;
+  sacrifices = [];
+  sacrificeMax = -1;
+  myPlayer = {hand:[]};
+  actualAnim = [];
+  enemyHandSize = 0;
+  mySideOfBattlefield = [null,null,null,null];
+  enemySideOfBattlefield = [null,null,null,null];
+
+  setTimeout(function () {
+    document.getElementById("myTurn").style.opacity = "0";
+    anim_dev([null,0]);
+    switchPages("Pick");
+    endAnim();
+  },3000);
+}
+
+function anim_addCard(anim) {
+  if(anim[1]) {
+    document.getElementById("myhandwrapper").innerHTML += getCardString(anim[3].name, anim[3].starve, anim[3].attack, anim[3].health,anim[3].symbol,( (100 * anim[2]) +30) + "px","30px","mh" +anim[2],"opacity:0");
+
+    setTimeout(function () {
+      document.getElementById("mh" + anim[2]).style.opacity = "1";
+      setTimeout(function () {
+        endAnim();
+      },500);
+    },100);
+  }
+  else  {
+    document.getElementById("enemyhandwrapper").innerHTML += getCardBackString(( (100 * anim[2]) +30) + "px","0px","eh" +anim[2],"opacity:0");
+
+    setTimeout(function () {
+      document.getElementById("eh" + anim[2]).style.opacity = "1";
+      setTimeout(function () {
+        endAnim();
+      },500);
+    },100);
   }
 }
 
@@ -165,16 +222,18 @@ function anim_drawCard(anim) {
       currentCardDom.classList.add("cardfloat");
       setTimeout(function() {
         //move it to its spot
+        currentCardDom.style.transition = "all 0.2s ease";
         currentCardDom.style.left = "calc(50% - 370px + " + anim[2] * 100 +"px)";
         currentCardDom.style.top = "calc(100vh - 190px )";
         currentCardDom.classList.remove("cardfloat");
         setTimeout(function() {
+          currentCardDom.style.transition = "all 0.5s ease";
           //put it in the hand element and make sure its positioned correctly
           currentCardDom.style.left = ( (100 * anim[2]) +30) + "px";
           currentCardDom.style.top = "30px";
           $("#mh" + anim[2]).appendTo("#myhandwrapper");
           endAnim();
-        },600);
+        },200);
       },600);
     },500);
 
@@ -197,16 +256,18 @@ function anim_drawCard(anim) {
       currentCardDom.classList.add("cardfloat");
       setTimeout(function() {
         //move it to its spot
+        currentCardDom.style.transition = "all 0.2s ease";
         currentCardDom.style.left = "calc(50% - 370px + " + anim[2] * 100 +"px)";
         currentCardDom.style.top = "-105px";
         currentCardDom.classList.remove("cardfloat");
         setTimeout(function() {
+          currentCardDom.style.transition = "all 0.5s ease";
           //put it in the hand element and make sure its positioned correctly
           currentCardDom.style.left = ( (100 * anim[2]) +30) + "px";
           currentCardDom.style.top = "0";
           $("#eh" + anim[2]).appendTo("#enemyhandwrapper");
           endAnim();
-        },600);
+        },200);
       },600);
     },500);
   }
@@ -222,17 +283,19 @@ function anim_returnDeckedCard(force = false) {
     sacrificeMax = -1;
 
     var cardOnDeckDOM = document.getElementById("mh" + storeDeck);
+    cardOnDeckDOM.style.transition = "all 0.2s ease";
     cardOnDeckDOM.style.left = "calc(50% - 370px + " + storeDeck * 100 +"px)";
     cardOnDeckDOM.style.top = "calc(100vh - 190px )";
     cardOnDeckDOM.classList.remove("cardfloat");
     setTimeout(function() {
       //put it in the hand element and make sure its positioned correctly
+      cardOnDeckDOM.style.transition = "all 0.5s ease";
       cardOnDeckDOM.style.left = ( (100 * storeDeck) +30) + "px";
       cardOnDeckDOM.style.top = "30px";
       $("#mh" + storeDeck).appendTo("#myhandwrapper");
       doingAnim = false;
 
-    },500);
+    },200);
 
   
   }
@@ -261,15 +324,32 @@ function anim_attackBeast(anim){
   if(anim[1]) {
     //ours
     var beastDOM = document.getElementById("mb" + anim[2]);
+    var beast = mySideOfBattlefield[anim[2]];
+
 
     beastDOM.classList.add("cardfloat");
 
     setTimeout(function () {
-      beastDOM.style.top = (parseInt(beastDOM.style.top.split("px")[0]) - 30) + "px";
+      beastDOM.style.transition = "all 0.5s cubic-bezier(.88,-0.01,.9,.62)";
+
+      if(beast.symbol.includes("fly")) {
+        beastDOM.style.top = (parseInt(beastDOM.style.top.split("px")[0]) - 100) + "px";
+
+      }
+      else {
+        beastDOM.style.top = (parseInt(beastDOM.style.top.split("px")[0]) - 30) + "px";
+      }
       setTimeout(function () {
         endAnim();
-        beastDOM.style.top = (parseInt(beastDOM.style.top.split("px")[0]) + 30) + "px";
+        beastDOM.style.transition = "all 0.5s cubic-bezier(.17,.8,.44,.99)";
+        if(beast.symbol.includes("fly")) {
+          beastDOM.style.top = (parseInt(beastDOM.style.top.split("px")[0]) + 100) + "px";
+        }
+        else {
+          beastDOM.style.top = (parseInt(beastDOM.style.top.split("px")[0]) + 30) + "px";
+        }
         setTimeout(function () {
+          beastDOM.style.transition = "all 0.5s ease";
           beastDOM.classList.remove("cardfloat");
         }, 500);
       }, 500);
@@ -279,15 +359,30 @@ function anim_attackBeast(anim){
   else {
     //enemies
     var beastDOM = document.getElementById("eb" + anim[2]);
+    var beast = enemySideOfBattlefield[anim[2]];
     
     beastDOM.classList.add("cardfloat");
 
     setTimeout(function () {
-      beastDOM.style.top = (parseInt(beastDOM.style.top.split("px")[0]) + 30) + "px";
+      beastDOM.style.transition = "all 0.5s cubic-bezier(.88,-0.01,.9,.62)";
+      
+      if(beast.symbol.includes("fly")) {
+        beastDOM.style.top = (parseInt(beastDOM.style.top.split("px")[0]) + 100) + "px";
+      }
+      else {
+        beastDOM.style.top = (parseInt(beastDOM.style.top.split("px")[0]) + 30) + "px";
+      }
       setTimeout(function () {
         endAnim();
-        beastDOM.style.top = (parseInt(beastDOM.style.top.split("px")[0]) - 30) + "px";
+        beastDOM.style.transition = "all 0.5s cubic-bezier(.17,.8,.44,.99)";
+        if(beast.symbol.includes("fly")) {
+          beastDOM.style.top = (parseInt(beastDOM.style.top.split("px")[0]) - 100) + "px";
+        }
+        else {
+          beastDOM.style.top = (parseInt(beastDOM.style.top.split("px")[0]) - 30) + "px";
+        }
         setTimeout(function () {
+          beastDOM.style.transition = "all 0.5s ease";
           beastDOM.classList.remove("cardfloat");
         }, 500);
       }, 500);
@@ -343,8 +438,6 @@ function anim_hitBeast(anim){
               setTimeout(function () {
                 beastDOM.remove();
                 document.getElementById("game").innerHTML += getCardString(anim[3].name, anim[3].starve, anim[3].attack, anim[3].health,anim[3].symbol,((anim[2]*121)+1) + "px","162px","mb" +anim[2]);
-
-                
                 setTimeout(function () {
                   endAnim();
                 }, 200);
@@ -418,15 +511,16 @@ function anim_dieBeast(anim){
 
 function anim_startTurn(anim){
   if(anim[1]) {
+    document.getElementById("myTurn").innerText = "It is your turn.";
     document.getElementById("myTurn").style.opacity = "1";
     document.getElementById("bell").style.color = "white";
   }
   else {
-    document.getElementById("enTurn").style.opacity = "1";
+    document.getElementById("myTurn").innerText = "It is your opponent's turn.";
+    document.getElementById("myTurn").style.opacity = "1";
     document.getElementById("bell").style.color = "#313131";
   }
   setTimeout(function(){
-    document.getElementById("enTurn").style.opacity = "0";
     document.getElementById("myTurn").style.opacity = "0";
     setTimeout(function(){
       endAnim();

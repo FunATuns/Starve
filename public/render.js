@@ -31,11 +31,14 @@ function renderDeckedBattlefield() {
       for(var i = 0; i < mySideOfBattlefield.length; i++) {
         if(mySideOfBattlefield[i] == null || sacrifices.includes(i)) {
           
-          if(mySideOfBattlefield[i] != null && sacrifices.includes(i) && !mySideOfBattlefield[i].symbol.includes("sacrifice")) { 
+          if(mySideOfBattlefield[i] != null && sacrifices.includes(i) ) { 
             document.getElementById("mb" + i).classList.add("sacrificeChoose");
           }
 
-          document.getElementById("g" + (i + 4)).classList.add("placemarker");
+          if(!sacrifices.includes(i) || !mySideOfBattlefield[i].symbol.includes("sacrifice"))
+          {
+            document.getElementById("g" + (i + 4)).classList.add("placemarker");
+          }
         }
       }
     }
