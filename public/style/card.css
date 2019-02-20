@@ -1,0 +1,91 @@
+
+.cardback {
+	width: 120px;
+	height: 160px;
+	background-color: #4E4E4E;
+	position: absolute;
+	transition: all .5s ease;
+	border-radius: 5px;
+	box-shadow: -1px 1px 4px  black;
+}
+
+.card {
+	width: 120px;
+	height: 160px;
+	background-color: white;
+	background-image: url("images/cardoverlay.png");
+	position: absolute;
+	transition: all .5s ease;
+	border-radius: 5px;
+	box-shadow: -1px 1px 4px  black;
+	z-index: 8000;
+}
+
+.card:hover, .cardback:hover, .cardfloat {
+	z-index: 8005;
+	transform: scale(1.1);
+	box-shadow: -3px 3px 7px  black;
+}
+
+
+.card * {
+	color: black;
+	font-size: 25px;
+}
+
+.ctitle {
+	padding: 10px;
+	font-size: 15px;
+}
+
+.ccimg {
+	position: absolute;
+	top: 40px;
+}
+
+
+.cblood {
+	position: absolute;
+	top: 5px;
+}
+
+.csym {
+	position: absolute;
+	bottom: 10px;
+	left: calc(50% - 15px);
+}
+
+.ca {
+	position: absolute;
+	bottom: 10px;
+	left: 20px;
+}
+
+.ch {
+	position: absolute;
+	bottom: 10px;
+	right: 20px;
+}
+
+.sacrifice  {
+	background-color:#F3C3C3 !important;
+	transform: scale(0.9);
+}
+
+.sacrificeChoose  {
+	background-color:#634242 !important;
+	transform: scale(0.8);
+	transition: all .5s ease;
+}
+
+.sacrificeChoose:hover  {
+	background-color:#634242 !important;
+	transform: scale(0.8);
+}
+
+
+.die  {
+	background-color:#634242 !important;
+	transform: scale(0.1) !important;
+	opacity: 0!important;
+}

@@ -156,13 +156,13 @@ function anim_placeCard(anim) {
       currentCardDom.style.left = "calc(50% - 242px + " + ((anim[3] * 121) + 1) +"px)";
       currentCardDom.style.top = "calc(50vh - 60px)";
       currentCardDom.classList.remove("cardfloat");
+      cardOnDeck = -1;
+      sacrificeMax = -1;
+      sacrifices = [];
+      renderDeckedBattlefield();
       setTimeout(function() {
         currentCardDom.remove();
         document.getElementById("game").innerHTML += getCardString(mySideOfBattlefield[anim[3]].name, mySideOfBattlefield[anim[3]].starve,  mySideOfBattlefield[anim[3]].attack, mySideOfBattlefield[anim[3]].health,mySideOfBattlefield[anim[3]].symbol,((anim[3]*121)+1) + "px","162px","mb" +anim[3]);
-        cardOnDeck = -1;
-        sacrificeMax = -1;
-        sacrifices = [];
-        renderDeckedBattlefield();
         endAnim();
       },600);
     }
@@ -174,13 +174,13 @@ function anim_placeCard(anim) {
       setTimeout(function() {
         currentCardDom.style.left = "calc(50% - 242px + " + ((anim[3] * 121) + 1) +"px)";
         currentCardDom.style.top = "calc(50vh - 60px)";
+        cardOnDeck = -1;
+        sacrificeMax = -1;
+        sacrifices = [];
+        renderDeckedBattlefield();
         setTimeout(function() {
           currentCardDom.remove();
           document.getElementById("game").innerHTML += getCardString(mySideOfBattlefield[anim[3]].name, mySideOfBattlefield[anim[3]].starve,  mySideOfBattlefield[anim[3]].attack, mySideOfBattlefield[anim[3]].health,mySideOfBattlefield[anim[3]].symbol,((anim[3]*121)+1) + "px","162px","mb" +anim[3]);
-          cardOnDeck = -1;
-          sacrificeMax = -1;
-          sacrifices = [];
-          renderDeckedBattlefield();
           endAnim();
         },600);
       },600);
@@ -201,7 +201,9 @@ function anim_placeCard(anim) {
       currentCardDom.style.top = "calc(50vh - 221px )";
       setTimeout(function() {
         currentCardDom.remove();
-        document.getElementById("game").innerHTML += getCardString(enemySideOfBattlefield[anim[3]].name, enemySideOfBattlefield[anim[3]].starve, enemySideOfBattlefield[anim[3]].attack, enemySideOfBattlefield[anim[3]].health,enemySideOfBattlefield[anim[3]].symbol,((anim[3]*121)+1) + "px","0px","eb" +anim[3]);
+        if(enemySideOfBattlefield[anim[3]]) {
+          document.getElementById("game").innerHTML += getCardString(enemySideOfBattlefield[anim[3]].name, enemySideOfBattlefield[anim[3]].starve, enemySideOfBattlefield[anim[3]].attack, enemySideOfBattlefield[anim[3]].health,enemySideOfBattlefield[anim[3]].symbol,((anim[3]*121)+1) + "px","0px","eb" +anim[3]);
+        }
         endAnim();
       },600);
     },600);
@@ -311,9 +313,6 @@ function anim_endTurn(anim){
   //DINNNNG
 
   document.getElementById("bell").style.color = "#313131";
-  document.getElementById("game").classList.remove("zoombattlefield");
-
-
 
   anim_returnDeckedCard(true);
   renderDeckedBattlefield();

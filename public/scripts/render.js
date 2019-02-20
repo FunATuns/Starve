@@ -55,9 +55,6 @@ function renderDeckedBattlefield() {
       }
     }
   }
-
-
-
 }
 
 

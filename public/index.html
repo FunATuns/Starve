@@ -5,9 +5,15 @@
     <title>Starve</title>
     <link href="https://fonts.googleapis.com/css?family=Special+Elite" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="style/style.css">
+    <link rel="stylesheet" type="text/css" href="style/card.css">
   </head>
-  <body>
+  <body onload="startAnim()">
+    
+    <div id="Start" class="Page">
+      <div id="startmessage">Starve</div>
+    </div>
+
     <div id="Login" class="Page">
       <p>Starve</p>
       <input type="text" id ="name" placeholder="Name" autocomplete="off">
@@ -76,11 +82,12 @@
     <scirpt src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.16/p5.js"></script>
     <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
-    <script src="maps/world.js"></script>
-    <script src="aug.js"></script>
-    <script src="main.js"></script>
-    <script src="anim.js"></script>
-    <script src="render.js"></script>
+    <script src="libs/howler.core.js"></script>
+    <script src="scripts/aug.js"></script>
+    <script src="scripts/pick.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/anim.js"></script>
+    <script src="scripts/render.js"></script>
     
   </body>
 </html>

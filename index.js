@@ -20,7 +20,7 @@ var cards = [
   {
     name: "Stoat",
     attack: 1,
-    health: 3,
+    health: 4,
     starve: 1,
     symbol: "none"
   },
@@ -40,7 +40,7 @@ var cards = [
   },
   {
     name: "Wolf",
-    attack: 2,
+    attack: 3,
     health: 3,
     starve: 2,
     symbol: "none"
@@ -48,14 +48,14 @@ var cards = [
   {
     name: "Grizzly",
     attack: 4,
-    health: 4,
+    health: 5,
     starve: 3,
     symbol: "none"
   },
   {
     name: "Warren",
     attack: 0,
-    health: 3,
+    health: 4,
     starve: 1,
     symbol: "2card"
   },
@@ -98,7 +98,7 @@ console.log('User Connected');
   socket.on('EndTurn', function (data) {
     var match = getMatchByID(socket.id);
 
-    if(match.fighters[match.whoseTurn].id == socket.id ) {
+    if(match != null && match != undefined && match.fighters[match.whoseTurn].id == socket.id ) {
       match.endTurn();
     }
   });
@@ -106,7 +106,7 @@ console.log('User Connected');
   socket.on('PlaceCard', function (card, endLoc, sacrificeIndexs) {
     var match = getMatchByID(socket.id);
 
-    if(match.fighters[match.whoseTurn].id == socket.id ) {
+    if(match != null && match != undefined && match.fighters[match.whoseTurn].id == socket.id ) {
       match.placeCard(match.whoseTurn,card,sacrificeIndexs,endLoc);
     }
   });
@@ -116,6 +116,18 @@ console.log('User Connected');
 
     player.deck[i] = player.picks[0];
     player.picks.splice(0,1);
+
+    player.deck.sort(function (a,b) {
+      if(a.starve-b.starve == 0) {
+        if(a.name < b.name) { return -1; }
+        if(a.name > b.name) { return 1; }
+        return 0;
+      }
+      else {
+        return a.starve-b.starve;
+      }
+    });
+
     if(player.picks.length == 0) {
       player.inPick = false;
       socket.emit("Waiting",true);
@@ -145,8 +157,6 @@ console.log('User Connected');
 });
 
 function getMatchByID(id) {
-  console.log(matches);
-
   for(var i = 0; i < matches.length; i++) {
     if(matches[i].fighters[0].id == id || matches[i].fighters[1].id == id) {
       return matches[i];
@@ -246,8 +256,6 @@ function newMatch (player1, player2) {
             this.fighters[this.whoseTurn].dev += currentBeast.attack;
             this.fighters[this.otherTurn].dev -= currentBeast.attack;
 
-            console.log(this.fighters[this.whoseTurn].dev);
-
             this.fighters[this.whoseTurn].animate.push( ["dev",this.fighters[this.whoseTurn].dev ]);
             this.fighters[this.otherTurn].animate.push( ["dev",this.fighters[this.otherTurn].dev ]);
   
@@ -278,13 +286,12 @@ function newMatch (player1, player2) {
     },
 
     checkWin: function () {
-      if(this.fighters[0].dev <= -2) {
+      if(this.fighters[0].dev <= -20) {
         this.fighters[1].animate.push( ["gamedone",true]);
         this.fighters[0].animate.push( ["gamedone",false]);
 
         var player0 = getPlayerByID(this.fighters[0].id);
         var player1 = getPlayerByID(this.fighters[1].id);
-        console.log(player0);
 
         player0.inMatch = false;
         player1.inMatch = false;
@@ -304,14 +311,12 @@ function newMatch (player1, player2) {
           }
         }
       }
-      else if(this.fighters[1].dev <= -2) {
+      else if(this.fighters[1].dev <= -20) {
         this.fighters[1].animate.push( ["gamedone",false]);
         this.fighters[0].animate.push( ["gamedone",true]);
         
         var player0 = getPlayerByID(this.fighters[0].id);
         var player1 = getPlayerByID(this.fighters[1].id);
-
-        console.log(player0);
 
         player0.inMatch = false;
         player1.inMatch = false;
@@ -577,7 +582,7 @@ function matchMake() {
     if(!players[i].inMatch && !players[i].inPick &&  first == null) {
       first = players[i];
     }
-    else if(!players[i].inMatch && first !== null ) {
+    else if(!players[i].inMatch && !players[i].inPick && first !== null ) {
 
       console.log("Making match " + first.name + " " + players[i].name);
       players[i].inMatch = true;
