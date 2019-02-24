@@ -105,4 +105,6 @@ function getCardText(cardName) {
   else if(cardName=="Bee") {return "The Hyper Bee: A small creature that attacks the opponent directly."}
   else if(cardName=="Rabbit") {return "The Stupid Rabbit: A worthless creature good for absorbing shots."}
   else if(cardName=="Warren") {return "The Compact Warren: A home for all sorts of vermin. Gives you 2 rabbits when played."}
+  else if(cardName=="Deer") {return "The Coward Deer: After bucking it's antlers in attack, it quickly retreats to a nearby space."}
+  else if(cardName=="Sanke") {return "The Sly Snake: It's deadly poison kills anything it touches. It's a ruthless creature."}
 }

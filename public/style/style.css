@@ -93,6 +93,22 @@ table {
 	margin: 4vh auto;
 }
 
+#mute {
+	display: block;
+	width: 400px;
+	height: 70px;
+	margin: 0 auto;
+	text-align: center;
+
+	color:#4C4C4C;
+	font-size: 20px;
+
+	cursor: grab;
+
+	transition: all 0.5s ease;
+
+}
+
 #livesarea {
 	border-radius: 50px;;
 	background-color: #313131;
@@ -223,7 +239,7 @@ table {
 	width: 360px;
 	height: 320px;
 	background-color: white;
-	background-image: url("images/forest.png");
+	background-image: url("../images/forest.png");
 	position: absolute;
 	transition: all .5s ease;
 	cursor:copy;

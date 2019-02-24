@@ -1,7 +1,7 @@
 
 function renderAll() {
   console.log("render all");
-  renderHand(myPlayer.hand);
+  renderHand(myFighter.hand);
   renderEnemyHand(enemyHandSize);
   clearBattlefield();
   renderEmBattlefield(enemySideOfBattlefield);

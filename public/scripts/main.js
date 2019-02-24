@@ -12,17 +12,21 @@ var loginPage = document.getElementById("Login"),
     cardOnDeck = -1,
     sacrifices = [],
     sacrificeMax = -1,
-    myPlayer = {},
+    myFighter = {},
     myOverPlayer = {},
     actualAnim = [],
     enemyHandSize,
     mySideOfBattlefield,
     enemySideOfBattlefield,
     cardBeingPicked = false,
-    doingAnim = false;
+    muted = false,
+    doingAnim = false,
+    endingTurn = false;
 
 
 function startAnim() {
+  switchPages("Login");
+  /*
   switchPages("Start");
   var startMessage = document.getElementById("startmessage");
 
@@ -53,10 +57,10 @@ function startAnim() {
         },2500); 
       },2500); 
     },2000); 
-  },1500); 
+  },1500); */
 }
 
-var sound = new Howl({
+var backgroundMusic = new Howl({
   src: [ 'sounds/bckgrnd.mp3'],
   autoplay: true,
   loop: true,
@@ -66,8 +70,33 @@ var sound = new Howl({
   }
 });
 
+var slice = new Howl({
+  src: [ 'sounds/knifecut.mp3'],
+  onend: function() {
+    console.log('Finished!');
+  }
+});
 
-sound.fade(1, 0, 8000);
+function mute() {
+  muted = true;
+  backgroundMusic.fade(0.25,0,1500);
+  slice.play();
+  document.getElementById("mute").style.opacity = "0";
+  setTimeout(function () {
+    backgroundMusic.stop();
+    setTimeout(function () {
+      document.getElementById("mute").innerText = "Couldn't take it huh? Pathetic. You didn't need your ears anyways.";
+      document.getElementById("mute").style.opacity = "1";
+      setTimeout(function () {
+        document.getElementById("mute").style.opacity = "0";
+    
+      },3000);
+  
+    },1000);
+
+  },1000);
+}
+
 
 function start () {
  var name = document.getElementById("name").value;
@@ -97,7 +126,7 @@ function switchPages(page) {
 
 socket.on("You'reIn", function(player){
   switchPages("Wait");
-  myplayer = player;
+  myOverPlayer = player;
 });
 
 document.onkeypress = function (evt) {
@@ -115,7 +144,7 @@ myTurn (bool)
 turnStartTime (int)
 */
 socket.on("MatchUpdate", function (_myPlayer, _enemyHandSize, _mySideOfBattlefield, _enemySideOfBattlefield, _myTurn, _turnStartTime ) {
-  myPlayer = _myPlayer;
+  myFighter = _myPlayer;
   actualAnim = actualAnim.concat(_myPlayer.animate);
   enemyHandSize = _enemyHandSize;
   mySideOfBattlefield = _mySideOfBattlefield;
@@ -123,7 +152,7 @@ socket.on("MatchUpdate", function (_myPlayer, _enemyHandSize, _mySideOfBattlefie
   myTurn = _myTurn;
   turnStartTime = _turnStartTime;
 
-  document.getElementById("myname").innerText = myPlayer.name;
+  document.getElementById("myname").innerText = myFighter.name;
 
   doAnim();
 });
@@ -236,7 +265,7 @@ function clickCard (cardDOMID) {
     cardOnDeck = handID;
 
     sacrifices = [];
-    sacrificeMax = myPlayer.hand[handID].starve;
+    sacrificeMax = myFighter.hand[handID].starve;
 
     renderDeckedBattlefield();
 
@@ -283,7 +312,11 @@ function getCardBackString(left, top, id, extraStyle = ""){
 }
 
 function endTurn(){
-  if(myTurn) {
+  
+  if(myTurn && !doingAnim) {
     socket.emit("EndTurn","");
+  }
+  else if (myTurn ){
+    endingTurn = true;
   }
 }

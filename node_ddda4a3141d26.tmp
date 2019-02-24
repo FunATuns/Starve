@@ -597,10 +597,10 @@ function newPlayer (id, name) {
       defaultDeck.push(Object.assign({}, cards[0]));
     }
     else if(i < 27) {
-      defaultDeck.push(Object.assign({}, cards[3]));
+      defaultDeck.push(Object.assign({}, cards[9]));
     }
     else {
-      defaultDeck.push(Object.assign({}, cards[4]));
+      defaultDeck.push(Object.assign({}, cards[9]));
     }
   }
 
